@@ -1,0 +1,259 @@
+Strict JSON Schema design for the project 
+
+{
+  "project_summary": {
+    "title": "string",
+    "description": "string",
+    "target_users": ["string"],
+    "existing_solutions": ["string"],
+    "differentiation_strategy": "string"
+  },
+
+  "functional_requirements": [
+    {
+      "feature_name": "string",
+      "description": "string",
+      "why_needed": "string",
+      "complexity_level": 1
+    }
+  ],
+
+  "non_functional_requirements": {
+    "scalability": "string",
+    "security": "string",
+    "performance": "string",
+    "availability": "string"
+  },
+
+  "architecture_decision": {
+    "architecture_style": "monolith | modular monolith | microservices",
+    "reasoning": "string"
+  },
+
+  "system_architecture": {
+    "client_layer": "string",
+    "api_layer": "string",
+    "business_logic_layer": "string",
+    "data_layer": "string",
+    "external_services": ["string"],
+    "caching_layer": "string"
+  },
+
+  "deployment_architecture": {
+    "hosting": "string",
+    "database_hosting": "string",
+    "load_balancer": "string",
+    "cdn": "string",
+    "storage": "string"
+  },
+
+  "tech_stack_options": [
+    {
+      "stack_name": "string",
+      "recommended_for": "string",
+      "pros": ["string"],
+      "cons": ["string"],
+      "stack_specific_risks": ["string"]
+    }
+  ],
+
+  "idea_level_risks": ["string"],
+
+  "execution_roadmap": {
+    "week_1": {
+      "day_1": ["string"],
+      "day_2": ["string"]
+    },
+    "week_2": {},
+    "week_3": {},
+    "week_4": {}
+  },
+
+  "complexity_analysis": {
+    "idea_complexity_score": 1,
+    "reasoning": "string",
+    "knowledge_gain_score": 1
+  }
+}
+
+____________________________________________________________________________
+
+Hard field constraints---
+Short fields = max 100-150 words
+Lists = max 5-7 items
+scores = strict numeric range
+no markdown inside json
+no explanations outside json
+
+
+-----FINAL OUTPUT RULES---------
+Output MUST be valid JSON.
+No extra commentary.
+Max 5 functional requirements.
+Each description ≤ 120 words.
+Each risk ≤ 80 words.
+Each roadmap day ≤ 5 bullet points.
+Complexity score 1–10 only.
+
+THIS MAKES OUTPUT MORE STABLE
+
+
+_________________________________________________________________________________
+Command Structure(v0.1)
+==> {devarchitect init "project idea"}
+-> Saves project metadata locally
+-> Generates project_summary + functional_requirements
+
+==> {devarchitect analyze}
+Generates:
+  non_functional_requirements
+  architecture_decision
+  system_architecture
+  idea_level_risks
+
+==> {devarchitect stack}
+Generates tech_stack_options
+Generates deployment_architecture
+
+==> {devarchitect roadmap}
+Generates execution_roadmap
+Generates complexity_analysis
+
+==> {devarchitect export --format=md}
+Exports full compiled architecture document
+
+
+_______________________________________________________
+LOCAL STATE DESIGN (JSONS IN .devarchitect)
+
+.devarchitect/
+    config.json
+    summary.json
+    analysis.json
+    stack.json
+    roadmap.json
+
+WHY THIS ---
+Each command writes to its own file.
+User can manually edit any file.
+Future commands can re-read + refine.
+Easy to version control.
+Easy to extend later.
+
+------FLOW OF COMMANDS----- REQUIRED else ERRROR
+1 init
+2 analyze
+3 stack
+4 roadmap
+5 export
+
+
+HOW WE TALK TO LLM______________________________________________________________-
+Each command:
+    Has its own system prompt
+    Has its own strict JSON schema
+    Loads required previous state
+    Injects only relevant context
+    Validates output
+
+
+JSON ENFORCEMENT STRATERGY AS LLM BREAKS JSON ----------------------
+Step 1 — First Pass
+Call LLM
+Expect strict JSON
+Strip:
+Leading/trailing garbage
+Try to unmarshal into Go struct
+If success → done.
+If fail →
+
+Step 2 — Repair Pass (LLM-Assisted)
+We send:
+The following JSON is invalid.
+Fix it strictly according to this schema.
+Do not add commentary.
+Return only valid JSON.
+
+Include:
+The broken JSON
+The exact schema again
+Try parsing again.
+If still fails →
+
+Hard error.
+No silent acceptance.
+
+
+------------------------------------------- FOLDER STRUCTURE
+
+project-root/
+ ├── .devarchitect/
+ │    ├── state.json
+ │    ├── roadmap.json
+ │    ├── stack.json
+ │    ├── memory.json
+ │    └── logs/
+
+
+=====================================================================
+v0.1 Scope — Team-Ready but Simple
+
+We lock the scope so it’s achievable and meaningful:
+
+Single-directory, project-level state
+  .devarchitect/ inside project folder
+  Multiple JSONs: summary.json, analysis.json, stack.json, roadmap.json
+Strict dependency enforcement
+  Commands must run in order: init → analyze → stack → roadmap → export
+  Fail if prerequisites missing
+LLM Modular Prompts
+  Each command has its own system prompt
+  Loads only required previous JSON files
+  Strict JSON schema enforcement with double validation
+CLI architecture
+  Modular commands (init, analyze, stack, roadmap, export)
+  Internal separation: cmd/, internal/llm/, internal/schema/, internal/state/, internal/formatter/
+Team-safe starting point
+  Repo can hold .devarchitect/
+  Simple warnings if existing files will be overwritten
+  Conflict detection is manual for v0.1
+  No advanced locking yet
+Constraints
+  Max words per field (120–150)
+  Lists max 5–7 items
+  No commentary outside JSON
+
+✅ Outcome of v0.1-------------------------
+You already build a professional CLI system
+AI assists architecture but does not dictate
+Team can start collaborating (basic)
+Project is resume-worthy
+Foundation ready for advanced versioning, CRDTs, and team protocols in v0.2
+
+Final .devarchitect/ v0.1 Structure
+.project-root/
+ ├── .devarchitect/
+ │    ├── summary.json
+ │    │     └── versions/
+ │    │           ├── 2026-02-11_12-00.json
+ │    │           └── 2026-02-11_15-00.json
+ │    ├── analysis.json
+ │    │     └── versions/
+ │    ├── stack.json
+ │    │     └── versions/
+ │    ├── roadmap.json
+ │    │     └── versions/
+ │    └── logs/
+
+
+Rules v0.1:
+
+Each command reads last valid version before running.
+
+On save, JSON is written to main file and a timestamped version.
+
+If file exists → warning to user → manual overwrite option.
+
+All JSON strictly validated + double-pass repair.
+
+Commands must follow the strict order: init → analyze → stack → roadmap → export.

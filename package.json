@@ -1,0 +1,21 @@
+{
+  "name": "devarchitect",
+  "version": "0.1.0",
+  "description": "AI-assisted project architecture and planning tool",
+  "main": "index.js",
+  "bin": {
+    "devarchitect": "./src/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "inquirer": "^8.2.7"
+  }
+}
