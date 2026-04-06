@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const inquirer = require("inquirer");
 const { Command } = require("commander");
 const program = new Command();
 const { init } = require("./commands/init");
@@ -18,8 +17,6 @@ program
 program
   .command("init")
   .description("Initialized devarchitect in the current project")
-  .action(() => {
-    init();
-  });
+  .action(init);
 
 program.parse();
