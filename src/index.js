@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-const { Command } = require("commander");
+import { Command } from "commander";
 const program = new Command();
-const { init } = require("./commands/init");
-
+import { init } from "./commands/init.js";
+import { exportVision } from "./commands/export.js";
 // const args = process.argv.slice(2);
 
 // const options = args.filter((a) => a.startsWith("-"));
@@ -19,4 +19,8 @@ program
   .description("Initialized devarchitect in the current project")
   .action(init);
 
+program
+  .command("export")
+  .description("Exports the vision.json file as devarchitect-report.md")
+  .action(exportVision);
 program.parse();

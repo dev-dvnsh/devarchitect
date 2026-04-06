@@ -1,8 +1,7 @@
-#!/usr/bin/env node
-const inquirer = require("inquirer");
-const fs = require("fs");
-const path = require("path");
-const chalk = require("chalk").default;
+import inquirer from "inquirer";
+import fs from "fs";
+import path from "path";
+import chalk from "chalk";
 
 async function init() {
   const projectroot = process.cwd();
@@ -74,4 +73,4 @@ async function init() {
   // 6. print success message
 }
 
-module.exports = { init };
+export { init };
