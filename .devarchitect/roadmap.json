@@ -1,0 +1,15 @@
+{
+  "phaseArray": [
+    {
+      "phase": "1",
+      "name": "Cli",
+      "milestones": "some"
+    },
+    {
+      "phase": "2",
+      "name": "site",
+      "milestones": "wbsite"
+    }
+  ],
+  "createdAt": "2026-04-11T13:12:27.572Z"
+}
