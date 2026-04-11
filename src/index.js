@@ -7,6 +7,7 @@ import { exportVision } from "./commands/export.js";
 import { analyse } from "./commands/analyse.js";
 import { stack } from "./commands/stack.js";
 import { roadmap } from "./commands/roadmap.js";
+import { decision } from "./commands/decision.js";
 
 // const args = process.argv.slice(2);
 
@@ -46,5 +47,12 @@ program
     "Asks how many phases, then asks name and milestones for each phase, then creates .devarchitect/roadmap.json with a phases array inside.",
   )
   .action(roadmap);
+
+program
+  .command("decision")
+  .description(
+    "Asks about the decision, its need and other alternatives that were considered",
+  )
+  .action(decision);
 
 program.parse();
