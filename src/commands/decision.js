@@ -12,9 +12,6 @@ async function decision() {
   if (!fs.existsSync(visionPath)) {
     console.log(chalk.red("Please run devarchitect init first"));
   }
-  if (!fs.existsSync(visionPath)) {
-    console.log(chalk.red("Please run devarchitect init first"));
-  }
 }
 
 export { decision };
