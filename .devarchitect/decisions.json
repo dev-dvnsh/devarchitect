@@ -1,0 +1,14 @@
+[
+  {
+    "what": "Use JSON files instead of a database",
+    "why": "Lightweight, no setup, readable by humans",
+    "alternatives": "SQLite, MongoDB",
+    "decidedAt": "2026-04-20T10:48:06.496Z"
+  },
+  {
+    "what": "Use Commander.js for CLI parsing",
+    "why": "Most popular, well documented, simple API",
+    "alternatives": "Yargs and meow",
+    "decidedAt": "2026-04-20T10:48:46.266Z"
+  }
+]
