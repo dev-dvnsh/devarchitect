@@ -3,20 +3,24 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 
+import { checkPrereq } from "../utils.js";
+
 async function stack() {
   const rootDir = process.cwd();
   const devarchitectDir = path.join(rootDir, ".devarchitect");
   const visionPath = path.join(devarchitectDir, "vision.json");
   const analysePath = path.join(devarchitectDir, "analyse.json");
   const tectStackPath = path.join(devarchitectDir, "techstack.json");
-  if (!fs.existsSync(visionPath)) {
-    console.log(chalk.red("Please run devarchitect init first!"));
-    process.exit(1);
-  }
-  if (!fs.existsSync(analysePath)) {
-    console.log(chalk.red("Please run devarchitect analyse first"));
-    process.exit(1);
-  }
+  checkPrereq("vision.json", "init");
+  // if (!fs.existsSync(visionPath)) {
+  //   console.log(chalk.red("Please run devarchitect init first!"));
+  //   process.exit(1);
+  // }
+  checkPrereq("analyse.json", "analyse");
+  // // if (!fs.existsSync(analysePath)) {
+  //   console.log(chalk.red("Please run devarchitect analyse first"));
+  //   process.exit(1);
+  // }
   const answers = await inquirer.prompt([
     {
       type: "input",
