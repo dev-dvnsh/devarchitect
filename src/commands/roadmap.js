@@ -2,6 +2,9 @@ import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
+
+import { checkPrereq } from "../utils.js";
+
 async function roadmap() {
   const rootDir = process.cwd();
   const devarchitectDir = path.join(rootDir, ".devarchitect");
@@ -10,20 +13,23 @@ async function roadmap() {
   const stackPath = path.join(devarchitectDir, "techstack.json");
   const roadmapPath = path.join(devarchitectDir, "roadmap.json");
 
-  if (!fs.existsSync(visionPath)) {
-    console.log(chalk.red("Please run devarchitect init first!"));
-    process.exit(1);
-  }
+  checkPrereq("vision.json", "init");
+  // if (!fs.existsSync(visionPath)) {
+  //   console.log(chalk.red("Please run devarchitect init first!"));
+  //   process.exit(1);
+  // }
 
-  if (!fs.existsSync(analysePath)) {
-    console.log(chalk.red("Please run devarchitect analyse first!"));
-    process.exit(1);
-  }
+  checkPrereq("analyse.json", "analyse");
+  // if (!fs.existsSync(analysePath)) {
+  //   console.log(chalk.red("Please run devarchitect analyse first!"));
+  //   process.exit(1);
+  // }
 
-  if (!fs.existsSync(stackPath)) {
-    console.log(chalk.red("Please run devarchitect stack first!"));
-    process.exit(1);
-  }
+  checkPrereq("techstack.json");
+  // if (!fs.existsSync(stackPath)) {
+  //   console.log(chalk.red("Please run devarchitect stack first!"));
+  //   process.exit(1);
+  // }
 
   const askTotalPhases = await inquirer.prompt({
     type: "number",
