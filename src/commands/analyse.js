@@ -2,15 +2,18 @@ import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
+import { checkPrereq } from "../utils.js";
 
 async function analyse() {
   const projectroot = process.cwd();
   const devarchitectdir = path.join(projectroot, ".devarchitect");
   const visionPath = path.join(devarchitectdir, "vision.json");
-  if (!fs.existsSync(visionPath)) {
-    console.log(chalk.red("Please run devarchitect init first!"));
-    process.exit(1);
-  }
+  const commandPreReq = "init";
+  checkPrereq("vision.json", commandPreReq);
+  // if (!fs.existsSync(visionPath)) {
+  //   console.log(chalk.red("Please run devarchitect init first!"));
+  //   process.exit(1);
+  // }
   const visionFileData = fs.readFileSync(visionPath, "utf-8");
   const data = JSON.parse(visionFileData);
   console.log(chalk.yellow(`Analysing project: ${data.projectname}`));

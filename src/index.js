@@ -8,6 +8,7 @@ import { analyse } from "./commands/analyse.js";
 import { stack } from "./commands/stack.js";
 import { roadmap } from "./commands/roadmap.js";
 import { decision } from "./commands/decision.js";
+import { progress } from "./commands/progress.js";
 
 // const args = process.argv.slice(2);
 
@@ -54,5 +55,10 @@ program
     "Asks about the decision, its need and other alternatives that were considered",
   )
   .action(decision);
-
+program
+  .command("progress")
+  .description(
+    "Asks the programmer questions related to the roadmap to record progress and blockers to progress",
+  )
+  .action(progress);
 program.parse();

@@ -7,9 +7,11 @@ async function init() {
   const projectroot = process.cwd();
   const devarchitectdir = path.join(projectroot, ".devarchitect");
 
+  const visionpath = path.join(devarchitectdir, "vision.json");
+
   // 1. check if already initialized
-  if (fs.existsSync(devarchitectdir)) {
-    console.log(chalk.green("devarchitect already initialized"));
+  if (fs.existsSync(visionpath)) {
+    console.log(chalk.green("vision.json already exist"));
     process.exit(1);
   }
 
@@ -65,7 +67,6 @@ async function init() {
   // use fs.writefilesync — simpler than writefile for now
 
   const visionstring = JSON.stringify(vision, null, 2);
-  const visionpath = path.join(devarchitectdir, "vision.json");
 
   fs.writeFileSync(visionpath, visionstring, "utf-8");
 
