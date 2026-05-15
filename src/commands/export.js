@@ -1,14 +1,13 @@
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
+
+import { checkPrereq } from "../utils.js";
 function exportVision() {
   const projectroot = process.cwd();
   const devarchitectdir = path.join(projectroot, ".devarchitect");
   const visionPath = path.join(devarchitectdir, "vision.json");
-  if (!fs.existsSync(visionPath)) {
-    console.log(chalk.red("Please run devarchitect init first!"));
-    process.exit(1);
-  }
+  checkPrereq("vision.json", "init");
   const visionFileData = fs.readFileSync(visionPath, "utf-8");
   const data = JSON.parse(visionFileData);
   // console.log(data);

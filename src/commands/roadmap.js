@@ -14,22 +14,10 @@ async function roadmap() {
   const roadmapPath = path.join(devarchitectDir, "roadmap.json");
 
   checkPrereq("vision.json", "init");
-  // if (!fs.existsSync(visionPath)) {
-  //   console.log(chalk.red("Please run devarchitect init first!"));
-  //   process.exit(1);
-  // }
 
   checkPrereq("analyse.json", "analyse");
-  // if (!fs.existsSync(analysePath)) {
-  //   console.log(chalk.red("Please run devarchitect analyse first!"));
-  //   process.exit(1);
-  // }
 
   checkPrereq("techstack.json");
-  // if (!fs.existsSync(stackPath)) {
-  //   console.log(chalk.red("Please run devarchitect stack first!"));
-  //   process.exit(1);
-  // }
 
   const askTotalPhases = await inquirer.prompt({
     type: "number",

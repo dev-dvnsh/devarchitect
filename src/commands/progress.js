@@ -3,21 +3,15 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 
+import { checkPrereq } from "../utils.js";
 async function progress() {
   const rootDir = process.cwd();
   const devarchitectDir = path.join(rootDir, ".devarchitect");
-  const visionPath = path.join(devarchitectDir, "vision.json");
   const roadmapPath = path.join(devarchitectDir, "roadmap.json");
   const progressPath = path.join(devarchitectDir, "progress.json");
 
-  if (!fs.existsSync(visionPath)) {
-    console.log(chalk.red("Please run devarchitect init first"));
-    process.exit(1);
-  }
-  if (!fs.existsSync(roadmapPath)) {
-    console.log(chalk.red("Please run devarchitect roadmap first"));
-    process.exit(1);
-  }
+  checkPrereq("vision.json", "init");
+  checkPrereq("roadmap.json", "roadmap");
 
   const roadmapData = JSON.parse(fs.readFileSync(roadmapPath, "utf-8"));
   const phaseChoices = roadmapData.phaseArray.map((p) => p.name);

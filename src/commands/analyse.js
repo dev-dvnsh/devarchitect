@@ -10,10 +10,6 @@ async function analyse() {
   const visionPath = path.join(devarchitectdir, "vision.json");
   const commandPreReq = "init";
   checkPrereq("vision.json", commandPreReq);
-  // if (!fs.existsSync(visionPath)) {
-  //   console.log(chalk.red("Please run devarchitect init first!"));
-  //   process.exit(1);
-  // }
   const visionFileData = fs.readFileSync(visionPath, "utf-8");
   const data = JSON.parse(visionFileData);
   console.log(chalk.yellow(`Analysing project: ${data.projectname}`));

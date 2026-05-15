@@ -12,15 +12,7 @@ async function stack() {
   const analysePath = path.join(devarchitectDir, "analyse.json");
   const tectStackPath = path.join(devarchitectDir, "techstack.json");
   checkPrereq("vision.json", "init");
-  // if (!fs.existsSync(visionPath)) {
-  //   console.log(chalk.red("Please run devarchitect init first!"));
-  //   process.exit(1);
-  // }
   checkPrereq("analyse.json", "analyse");
-  // // if (!fs.existsSync(analysePath)) {
-  //   console.log(chalk.red("Please run devarchitect analyse first"));
-  //   process.exit(1);
-  // }
   const answers = await inquirer.prompt([
     {
       type: "input",
