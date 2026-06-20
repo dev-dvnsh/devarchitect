@@ -2,14 +2,20 @@
   "phaseArray": [
     {
       "phase": "1",
-      "name": "Cli",
-      "milestones": "some"
+      "name": "cli",
+      "milestones": [
+        "dev",
+        "init"
+      ]
     },
     {
       "phase": "2",
       "name": "site",
-      "milestones": "wbsite"
+      "milestones": [
+        "site",
+        "html"
+      ]
     }
   ],
-  "createdAt": "2026-04-11T13:12:27.572Z"
+  "createdAt": "2026-06-20T13:56:07.566Z"
 }

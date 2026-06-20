@@ -1,6 +1,28 @@
-{
-  "currentPhase": "Cli",
-  "completedMilestones": "uptill progress is done",
-  "blockers": "not till now ",
-  "completion": "25%"
-}
+[
+  {
+    "currentPhase": "cli",
+    "completedMilestones": [],
+    "blockers": "none",
+    "completion": "50%",
+    "recordedAt": "2026-06-20T13:54:05.106Z"
+  },
+  {
+    "currentPhase": "cli",
+    "completedMilestones": [
+      "init",
+      "command"
+    ],
+    "blockers": "command executible issue",
+    "completion": "75%",
+    "recordedAt": "2026-06-20T13:54:48.131Z"
+  },
+  {
+    "currentPhase": "cli",
+    "completedMilestones": [
+      "dev"
+    ],
+    "blockers": "none",
+    "completion": "50%",
+    "recordedAt": "2026-06-20T13:56:23.100Z"
+  }
+]

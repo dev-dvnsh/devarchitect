@@ -16,17 +16,27 @@ async function progress() {
   const roadmapData = JSON.parse(fs.readFileSync(roadmapPath, "utf-8"));
   const phaseChoices = roadmapData.phaseArray.map((p) => p.name);
 
-  const answers = await inquirer.prompt([
+  const { currentPhase } = await inquirer.prompt([
     {
       type: "list",
       name: "currentPhase",
       message: "Which phase are you currently in?",
       choices: phaseChoices,
     },
+  ]);
+
+  const selectedPhase = roadmapData.phaseArray.find(
+    (p) => p.name === currentPhase,
+  );
+
+  // console.log(selectedPhase?.milestones ?? []);
+
+  const rest = await inquirer.prompt([
     {
-      type: "input",
+      type: "checkbox",
       name: "completedMilestones",
       message: "Which milestones are complete?",
+      choices: selectedPhase?.milestones ?? [],
     },
     {
       type: "input",
@@ -41,14 +51,20 @@ async function progress() {
     },
   ]);
 
-  const progressData = {
-    ...answers,
-    createdAt: new Date().toISOString,
-  };
+  const existing = fs.existsSync(progressPath)
+    ? JSON.parse(fs.readFileSync(progressPath, "utf-8"))
+    : [];
+
+  const progressArray = Array.isArray(existing) ? existing : [];
+  progressArray.push({
+    currentPhase,
+    ...rest,
+    recordedAt: new Date().toISOString(),
+  });
 
   fs.writeFileSync(
     progressPath,
-    JSON.stringify(progressData, null, 2),
+    JSON.stringify(progressArray, null, 2),
     "utf-8",
   );
 

@@ -38,13 +38,13 @@ async function roadmap() {
       {
         type: "input",
         name: "milestone",
-        message: `Please enter the milestone for phase ${i + 1}\n`,
+        message: `Please enter the milestone for phase ${i + 1}\n (comma seperated)`,
       },
     ]);
     const phaseObj = {
       phase: `${i + 1}`,
       name: `${response.name}`,
-      milestones: `${response.milestone}`,
+      milestones: response.milestone.split(",").map((m) => m.trim()),
     };
     phaseArray.push(phaseObj);
   }
