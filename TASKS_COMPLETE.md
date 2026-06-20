@@ -195,7 +195,7 @@ with all six sections filled in cleanly.
 
 ---
 
-## Task 11 — Versioning with .bak Files
+## Task 11 — Versioning .bak Files
 
 ### Purpose
 

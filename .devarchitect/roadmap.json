@@ -3,18 +3,12 @@
     {
       "phase": "1",
       "name": "cli",
-      "milestones": [
-        "dev",
-        "init"
-      ]
+      "milestones": ["dev", "init"]
     },
     {
       "phase": "2",
       "name": "site",
-      "milestones": [
-        "site",
-        "html"
-      ]
+      "milestones": ["site", "html"]
     }
   ],
   "createdAt": "2026-06-20T13:56:07.566Z"

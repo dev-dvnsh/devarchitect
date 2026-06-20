@@ -10,14 +10,14 @@ async function roadmap() {
   const devarchitectDir = path.join(rootDir, ".devarchitect");
   const visionPath = path.join(devarchitectDir, "vision.json");
   const analysePath = path.join(devarchitectDir, "analyse.json");
-  const stackPath = path.join(devarchitectDir, "techstack.json");
+  const stackPath = path.join(devarchitectDir, "stack.json");
   const roadmapPath = path.join(devarchitectDir, "roadmap.json");
 
   checkPrereq("vision.json", "init");
 
   checkPrereq("analyse.json", "analyse");
 
-  checkPrereq("techstack.json");
+  checkPrereq("stack.json", "stack");
 
   const askTotalPhases = await inquirer.prompt({
     type: "number",

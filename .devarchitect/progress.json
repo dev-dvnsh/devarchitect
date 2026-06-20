@@ -8,19 +8,14 @@
   },
   {
     "currentPhase": "cli",
-    "completedMilestones": [
-      "init",
-      "command"
-    ],
+    "completedMilestones": ["init", "command"],
     "blockers": "command executible issue",
     "completion": "75%",
     "recordedAt": "2026-06-20T13:54:48.131Z"
   },
   {
     "currentPhase": "cli",
-    "completedMilestones": [
-      "dev"
-    ],
+    "completedMilestones": ["dev"],
     "blockers": "none",
     "completion": "50%",
     "recordedAt": "2026-06-20T13:56:23.100Z"
@@ -28,9 +23,7 @@
   {
     "commandRunCount": 4,
     "currentPhase": "site",
-    "completedMilestones": [
-      "site"
-    ],
+    "completedMilestones": ["site"],
     "blockers": "no",
     "completion": "75%",
     "recordedAt": "2026-06-20T14:09:42.560Z"
@@ -38,15 +31,11 @@
   {
     "commandRunCount": 5,
     "currentPhase": "cli",
-    "allPhases": [
-      "cli",
-      "site"
-    ],
-    "completedMilestones": [
-      "dev"
-    ],
+    "allPhases": ["cli", "site"],
+    "completedMilestones": ["dev"],
     "blockers": "no",
     "completion": "0%",
     "recordedAt": "2026-06-20T15:41:41.608Z"
   }
 ]
+

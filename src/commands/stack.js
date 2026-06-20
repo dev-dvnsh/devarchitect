@@ -10,7 +10,7 @@ async function stack() {
   const devarchitectDir = path.join(rootDir, ".devarchitect");
   const visionPath = path.join(devarchitectDir, "vision.json");
   const analysePath = path.join(devarchitectDir, "analyse.json");
-  const tectStackPath = path.join(devarchitectDir, "techstack.json");
+  const stackPath = path.join(devarchitectDir, "stack.json");
   checkPrereq("vision.json", "init");
   checkPrereq("analyse.json", "analyse");
   const answers = await inquirer.prompt([
@@ -42,16 +42,16 @@ async function stack() {
     },
   ]);
 
-  const teckStackWithDate = {
+  const stackWithDate = {
     ...answers,
     createdAt: new Date().toISOString(),
   };
 
-  const techStackString = JSON.stringify(teckStackWithDate, null, 2);
+  const stackString = JSON.stringify(stackWithDate, null, 2);
 
-  fs.writeFileSync(tectStackPath, techStackString, "utf-8");
+  fs.writeFileSync(stackPath, stackString, "utf-8");
 
-  console.log(chalk.yellow("Saved to .devarchitect/techstack.json"));
+  console.log(chalk.yellow("Saved to .devarchitect/stack.json"));
 }
 
 export { stack };
