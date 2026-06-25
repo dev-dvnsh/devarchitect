@@ -12,4 +12,24 @@ function checkPrereq(filename, commandName) {
   }
 }
 
-export { checkPrereq };
+function backupIfExist(filePath, command) {
+  const projectroot = process.cwd();
+  const devarchitectdir = path.join(projectroot, ".devarchitect");
+  const dirPath = path.join(devarchitectdir, "backup", command);
+  const fileName = path.basename(filePath, ".json");
+  const newFilePath = path.join(
+    dirPath,
+    fileName +
+      "." +
+      new Date().toISOString().slice(0, 16).replaceAll(":", "-") +
+      ".bak",
+  );
+  if (fs.existsSync(filePath)) {
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+    fs.copyFileSync(filePath, newFilePath);
+  }
+}
+
+export { checkPrereq, backupIfExist };

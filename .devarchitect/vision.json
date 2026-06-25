@@ -1,8 +1,9 @@
 {
   "projectname": "devarchitect",
-  "problem": "Easy continuation for already existing codebases for new programmers",
-  "target": "devs",
+  "problem": "Easy continuation of a project for developers",
+  "target": "developers",
   "platform": "cli",
   "teamsize": 1,
-  "createdat": "2026-05-14T05:21:27.514Z"
+  "createdat": "2026-06-25T13:45:01.897Z"
 }
+

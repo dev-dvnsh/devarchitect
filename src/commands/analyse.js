@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
-import { checkPrereq } from "../utils.js";
+import { checkPrereq, backupIfExist } from "../utils.js";
 
 async function analyse() {
   const projectroot = process.cwd();
@@ -45,6 +45,7 @@ async function analyse() {
 
   const analysestring = JSON.stringify(analyse, null, 2);
   const analysePath = path.join(devarchitectdir, "analyse.json");
+  backupIfExist(analysePath, "analyse");
 
   fs.writeFileSync(analysePath, analysestring, "utf-8");
 

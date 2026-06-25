@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 
-import { checkPrereq } from "../utils.js";
+import { checkPrereq, backupIfExist } from "../utils.js";
 
 async function stack() {
   const rootDir = process.cwd();
@@ -17,28 +17,28 @@ async function stack() {
     {
       type: "input",
       name: "frontend",
-      message: "What is your frontend technology?",
+      message: "what is your frontend technology?",
     },
     {
       type: "input",
       name: "backend",
-      message: "What is your backend technology?",
+      message: "what is your backend technology?",
     },
     {
       type: "input",
       name: "database",
-      message: "What is your database",
+      message: "what is your database?",
     },
     {
       type: "list",
       name: "deployment",
-      message: "What is your deployment Platform",
+      message: "what is your deployment Platform?",
       choices: ["AWS", "GCP", "Azure", "Vercel", "Railway", "Other"],
     },
     {
       type: "input",
       name: "tools",
-      message: "Any other tools or services?",
+      message: "any other tools or services?",
     },
   ]);
 
@@ -48,6 +48,7 @@ async function stack() {
   };
 
   const stackString = JSON.stringify(stackWithDate, null, 2);
+  backupIfExist(stackPath, "stack");
 
   fs.writeFileSync(stackPath, stackString, "utf-8");
 

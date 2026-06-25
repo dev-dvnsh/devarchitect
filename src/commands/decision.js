@@ -24,7 +24,7 @@ async function decision() {
     {
       type: "input",
       name: "alternatives",
-      message: "What alternatives were considered\n",
+      message: "What alternatives were considered?\n",
     },
   ]);
   // check if file exists and read it, otherwise start fresh

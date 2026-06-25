@@ -223,7 +223,7 @@ This is devarchitect's equivalent of Git's ability to go back in time.
   needs a way to recover from mistakes. This is the simplest possible
   versioning system.
 - The .bak filename pattern:
-  vision.json → vision.json.2026-04-06T09-12-39.bak
+  vision.json → v.json.2026-04-06T09-12-39.bak
 
 ### What to Build
 

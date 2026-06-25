@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 
-import { checkPrereq } from "../utils.js";
+import { checkPrereq, backupIfExist } from "../utils.js";
 
 async function roadmap() {
   const rootDir = process.cwd();
@@ -22,7 +22,7 @@ async function roadmap() {
   const askTotalPhases = await inquirer.prompt({
     type: "number",
     name: "phasesno",
-    message: "How many phases does your project have?",
+    message: "how many phases does your project have?",
   });
   const totalPhases = askTotalPhases.phasesno;
   const phaseArray = [];
@@ -33,12 +33,12 @@ async function roadmap() {
       {
         type: "input",
         name: "name",
-        message: `Please enter the name for phase ${i + 1}\n`,
+        message: `enter the name for phase ${i + 1}\n`,
       },
       {
         type: "input",
         name: "milestone",
-        message: `Please enter the milestone for phase ${i + 1}\n (comma seperated)`,
+        message: `enter the milestone for phase ${i + 1}\n (comma seperated)`,
       },
     ]);
     const phaseObj = {
@@ -55,6 +55,7 @@ async function roadmap() {
   };
 
   const roadmapString = JSON.stringify(objWithCreatedAt, null, 2);
+  backupIfExist(roadmapPath, "roadmap");
   fs.writeFileSync(roadmapPath, roadmapString, "utf-8");
 
   console.log(

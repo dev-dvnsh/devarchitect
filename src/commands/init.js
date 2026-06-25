@@ -2,6 +2,8 @@ import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
+import { backupIfExist } from "../utils.js";
+import { exit } from "process";
 
 async function init() {
   const projectroot = process.cwd();
@@ -12,7 +14,16 @@ async function init() {
   // 1. check if already initialized
   if (fs.existsSync(visionpath)) {
     console.log(chalk.green("vision.json already exist"));
-    process.exit(1);
+    const overwriteVision = await inquirer.prompt({
+      type: "input",
+      name: "overwrite",
+      message:
+        "Do you want to overwrite vision.json (press n to exit and ENTER to continue)",
+      default: true,
+    });
+    if (overwriteVision.overwrite !== true) {
+      process.exit(1);
+    }
   }
 
   // 2. ask questions
@@ -32,12 +43,12 @@ async function init() {
     {
       type: "input",
       name: "problem",
-      message: "describe the problem it solves!",
+      message: "what problem does it solves?",
     },
     {
       type: "input",
       name: "target",
-      message: "who is this project for",
+      message: "who is this project for?",
     },
     {
       type: "list",
@@ -48,7 +59,7 @@ async function init() {
     {
       type: "number",
       name: "teamsize",
-      message: "enter the size of your team",
+      message: "what is the size of your team?",
     },
   ]);
 
@@ -67,6 +78,8 @@ async function init() {
   // use fs.writefilesync — simpler than writefile for now
 
   const visionstring = JSON.stringify(vision, null, 2);
+
+  backupIfExist(visionpath, "vision");
 
   fs.writeFileSync(visionpath, visionstring, "utf-8");
 

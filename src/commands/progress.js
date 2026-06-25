@@ -23,7 +23,7 @@ async function progress() {
     {
       type: "list",
       name: "currentPhase",
-      message: "Which phase are you currently in?",
+      message: "which phase are you currently in?",
       choices: phaseChoices,
     },
   ]);
@@ -38,18 +38,18 @@ async function progress() {
     {
       type: "checkbox",
       name: "completedMilestones",
-      message: "Which milestones are complete?",
+      message: "which milestones are complete?",
       choices: selectedPhase?.milestones ?? [],
     },
     {
       type: "input",
       name: "blockers",
-      message: "Any blockers",
+      message: "any blockers?",
     },
     {
       type: "list",
       name: "completion",
-      message: "Overall completion percentage",
+      message: "overall completion percentage?",
       choices: ["0%", "25%", "50%", "75%", "100%"],
     },
   ]);
