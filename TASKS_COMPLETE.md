@@ -293,395 +293,681 @@ files that are missing, with the correct next command to run.
 
 ---
 
+# devarchitect — Tasks 13 to 21 (Server + Dashboard)
+
+> Session structure for every task:
+>
+> 1. Purpose
+> 2. Prerequisite Check
+> 3. Learn First
+> 4. Jot Down in Notebook
+> 5. What to Do
+> 6. You Will Know It Works When
+
+---
+
 ## PART 2 — Local Server
 
 ---
 
-## Task 13 — Setup Express Server
+## Task 13 — Build the HTTP Server
 
 ### Purpose
 
-The CLI stores data as JSON files. The React dashboard needs to read
-that data over HTTP. This Express server is the bridge between them —
-it reads the .devarchitect/ JSON files and exposes them as REST API
-endpoints. It is a tiny server with one job: serve the project data
-to whoever asks for it.
+The CLI stores engineering memory as JSON files on disk. The dashboard
+running in the browser has no way to read files from disk directly —
+browsers cannot access your file system for security reasons. The server
+solves this. It sits between the dashboard and the JSON files — the
+browser asks the server for data, the server reads the files and sends
+them back. This is the bridge that connects the CLI world to the browser
+world. We use Node's built-in http module — no Express, no extra
+installs. This teaches you how HTTP actually works before frameworks
+hide it from you.
 
-### Learn First — search these, 20 mins max
+### Prerequisite Check
 
-1. express js basic server setup nodejs
-   You already know Express from MERN. This is the same thing.
-   Search: express js hello world example
+- .devarchitect/ folder should exist with at least vision.json
+  so you have data to test the server with. Run devarchitect init
+  first if you haven't already.
 
-2. express js serve static files
-   The server will also serve the React build files so the browser
-   can load the dashboard.
-   Search: express static files middleware
+### Learn First — search these, 30 mins max
 
-3. cors npm nodejs
-   The React app runs on a different port than the server during
-   development. CORS allows them to talk to each other.
-   Search: cors npm express example
+1. nodejs http module createServer example
+   Understand: what req and res are, what req.url contains,
+   how res.writeHead and res.end work
+
+2. nodejs http server routing by url
+   Search: nodejs http server handle different routes manually
+   Understand: how to check req.url and send different responses
+   for different paths without Express
+
+3. nodejs http response headers
+   Search: nodejs http setHeader Content-Type
+   Understand: what Content-Type application/json means and
+   what the CORS header Access-Control-Allow-Origin does and why
+   the browser needs it
 
 ### Jot Down in Notebook
 
-- What CORS is — Cross Origin Resource Sharing. Browsers block
-  requests between different origins (ports/domains) by default
-  for security. CORS headers tell the browser to allow it.
-- The difference between development and production server setup:
-  Dev: React on port 5173, Express on port 3001, CORS needed
-  Prod: Express serves the React build, same port, no CORS needed
+- What req and res are:
+  req = the incoming request from the browser (contains url, method, headers)
+  res = your outgoing response (you set status, headers, and body)
 
-### What to Build
+- What res.writeHead does:
+  Sets the HTTP status code and response headers before sending data
+  200 means OK, 404 means not found
 
-1. Create src/server/index.js
-2. Install express and cors:
-   npm install express cors
-3. Build these endpoints:
-   GET /api/status — returns which JSON files exist
+- What Content-Type header does:
+  Tells the browser what kind of data is coming back
+  application/json tells it to expect JSON
+
+- What CORS is and why you need it:
+  Browsers block requests between different origins by default
+  Your dashboard runs at localhost:3001 and so does the server
+  but during development if you open the HTML file directly the
+  origin is different — the CORS header Access-Control-Allow-Origin: \*
+  tells the browser to allow the request from any origin
+
+- The readJson helper pattern:
+  Write one function that takes a filename, checks if it exists,
+  reads it and parses it, and returns the data or null if missing.
+  Every endpoint calls this one function. DRY principle.
+
+- Response shape — use this shape for every endpoint:
+  success true → { success: true, data: <parsed json contents> }
+  success false → { success: false, data: null }
+
+### What to Do
+
+1. Create the folder src/server/ inside your project
+2. Create src/server/index.js
+3. Write a readJson(filename) helper function that:
+   - Builds the full path to .devarchitect/filename
+   - Checks if the file exists
+   - If yes reads it, parses it, and returns the parsed object
+   - If no returns null
+4. Create an http server using http.createServer()
+5. Inside the server callback check req.url and route to the
+   correct response for each of these paths:
+   GET /api/status — returns an object with true/false for each
+   of the 6 json files showing which exist
    GET /api/vision — returns vision.json contents
    GET /api/analysis — returns analysis.json contents
    GET /api/stack — returns techstack.json contents
    GET /api/roadmap — returns roadmap.json contents
    GET /api/decisions — returns decisions.json contents
    GET /api/progress — returns progress.json contents
-4. Each endpoint should return { data: null, message: "not found" }
-   if the file does not exist — never crash on missing files
+6. Set Content-Type and CORS headers on every response
+7. For any unknown url return 404 with a not found message
+8. Start the server listening on port 3001
+9. Export the server from the file using module.exports
 
 ### You Will Know It Works When
 
-You run:
-node src/server/index.js
-Then open browser at <http://localhost:3001/api/vision>
-You see your vision.json data returned as JSON in the browser.
+You run node src/server/index.js in your terminal and then open
+these URLs in your browser one by one:
+<http://localhost:3001/api/vision> → shows your vision data as JSON
+<http://localhost:3001/api/status> → shows true/false for each file
+<http://localhost:3001/api/decisions> → shows your decisions array
+Any unknown url like /api/blah → shows a 404 response
+The terminal is not blocked and the server keeps running.
 
 ---
 
-## Task 14 — `dashboard` command
+## Task 14 — `dashboard` Command
 
 ### Purpose
 
-The dashboard command is the entry point for the visual UI. It starts
-the Express server and opens the browser automatically so the developer
-does not have to remember a port number or URL. One command, browser
-opens, data appears.
+Nobody wants to manually open a terminal, run the server, then open a
+browser and type a URL. The dashboard command does all of that in one
+step. It starts the server as a background process so the terminal stays
+free, waits for the server to boot, then automatically opens the browser
+at the right URL. This is the same experience as running npm run dev
+in any modern web project — one command, everything starts.
+
+### Prerequisite Check
+
+- .devarchitect/vision.json must exist — if not print a message
+  telling the user to run devarchitect init first and exit
 
 ### Learn First — search these, 20 mins max
 
-1. nodejs open browser from terminal programmatically
-   Search: nodejs open url in browser programmatically
-   There is a package called "open" that does this in one line.
+1. nodejs child_process spawn detached background process
+   Search: nodejs spawn detached process stdio ignore unref
+   Understand: what detached means, what unref does, and why
+   you need stdio ignore for a background process
 
-2. nodejs child_process spawn
-   You will use this to start the Express server as a background
-   process from within the dashboard command.
-   Search: nodejs child_process spawn example
+2. nodejs open npm package
+   Search: open npm package nodejs open url in browser
+   This package opens any URL in the default browser in one line
+   and works on Linux, Mac, and Windows
+
+3. javascript setTimeout with async await
+   Search: nodejs wait n milliseconds async await
+   You need to wait about 1500ms after spawning the server
+   before opening the browser so the server has time to start
 
 ### Jot Down in Notebook
 
-- What child_process is — Node can spawn other processes from within
-  itself. This is how you start the server from inside the CLI command
-  without blocking the terminal.
+- What child_process.spawn does:
+  Starts a new separate process from inside your Node code
+  Like running a command in the terminal but from code
+  The spawned process runs independently of your CLI
 
-### What to Build
+- What detached: true means:
+  The spawned process can keep running even after your CLI exits
+  Without this the server would stop when devarchitect exits
 
-1. Install the open package:
-   npm install open
+- What server.unref() does:
+  Tells Node not to wait for this child process before exiting
+  Without unref() your CLI would hang and never return control
+  to the terminal
+
+- Why wait before opening the browser:
+  The server needs time to start listening on port 3001
+  If the browser opens immediately the server is not ready yet
+  and the page will show a connection refused error
+
+### What to Do
+
+1. Install the open package: npm install open
 2. Create src/commands/dashboard.js
-3. It should:
-   - Start the Express server using child_process
-   - Wait 1 second for the server to boot
-   - Open <http://localhost:3001> in the browser using open
-   - Print: Dashboard running at <http://localhost:3001>
-4. Register it in index.js as devarchitect dashboard
+3. Check that vision.json exists — exit with message if not
+4. Use child_process.spawn to start node src/server/index.js
+   with detached true and stdio ignore then call unref on it
+5. Use setTimeout wrapped in a Promise to wait 1500ms
+6. Use the open package to open <http://localhost:3001>
+7. Print a success message showing the URL
+8. Register the command in src/index.js
 
 ### You Will Know It Works When
 
-devarchitect dashboard
-Opens the browser at <http://localhost:3001> automatically and the
-server is running and responding to API requests.
+You run devarchitect dashboard and:
+
+- The terminal prints the success message and returns to prompt
+- The browser opens automatically at <http://localhost:3001>
+- The server is responding — you can visit /api/vision and see data
+- You can still type commands in the terminal — it is not blocked
 
 ---
 
-## PART 3 — React Dashboard
+## PART 3 — Vanilla Dashboard
 
 ---
 
-## Task 15 — Setup React App
+## Task 15 — Dashboard HTML Structure
 
 ### Purpose
 
-Create the React app that will become the visual dashboard. Since you
-know React from MERN this setup will be fast. The React app lives inside
-the devarchitect project but is a separate application that talks to
-the Express server via API calls.
+Build the skeleton of the control panel — the HTML layout with a
+sidebar of buttons on the left and a content area on the right.
+No data or interactivity yet, just the structure. This layout is
+designed with AI in mind — the right panel has two sections stacked
+vertically, the top shows stored data and the bottom is reserved for
+AI suggestions. When the final year project adds AI, there is already
+a clear place for it. We use vanilla HTML and CSS — no React, no
+build step, opens instantly in any browser.
+
+### Prerequisite Check
+
+- src/server/index.js must exist and serve files from src/public/
+  Make sure your server serves index.html when GET / is requested
+  before building the HTML so you can preview it in the browser
+
+### Learn First — search these, 20 mins max
+
+1. css grid two column layout sidebar
+   Search: css grid sidebar layout fixed width example
+   Understand: how to make a fixed width left sidebar and a
+   flexible right content area using CSS Grid
+
+2. html data attributes
+   Search: html data attributes example
+   Understand: what data-section="vision" means on a button and
+   how JavaScript reads it later using dataset.section
+   This is how each button tells JavaScript which section to load
+
+3. css custom properties variables
+   Search: css variables custom properties tutorial
+   Understand: how to define colors in :root and use them
+   with var(--color-name) throughout the stylesheet
+
+### Jot Down in Notebook
+
+- CSS Grid vs Flexbox:
+  Flexbox works in one direction — either a row or a column
+  Grid works in two directions — rows AND columns at the same time
+  For a sidebar plus content layout Grid is the right choice
+
+- HTML data attributes:
+  You can store any value on an HTML element using data-anything
+  Example: <button data-section="vision">Vision</button>
+  In JavaScript you read it with: button.dataset.section
+  This avoids hardcoding section names in your JS logic
+
+- CSS variables:
+  Define once in :root, use everywhere with var()
+  Change one value to retheme the entire dashboard
+  Makes the design consistent and easy to maintain
+
+### What to Do
+
+1. Create the folder src/public/
+2. Create src/public/index.html
+3. Update src/server/index.js to serve index.html when GET / is
+   requested — read the file and send it with Content-Type text/html
+4. Build the HTML structure with these sections:
+   - A header bar across the top with the app name devarchitect
+     and a placeholder where the project name will appear
+   - A left sidebar containing one button for each section:
+     Vision, Analyze, Stack, Roadmap, Decision, Progress, Export
+     Each button should have a data-section attribute and a small
+     colored dot element next to the label (for status indication)
+   - A main content area on the right with two panels stacked:
+     Top panel: labeled "Project Data" — data renders here
+     Bottom panel: labeled "AI Suggestions" — placeholder for now
+5. Link style.css and app.js in the HTML head and body
+
+### You Will Know It Works When
+
+You run devarchitect dashboard and the browser shows the layout —
+sidebar with 7 buttons on the left and two empty panels on the right.
+No styling yet, no data yet, just the structure in plain HTML.
+
+---
+
+## Task 16 — Dashboard Styles
+
+### Purpose
+
+Make the dashboard look like a professional developer tool. A dark
+theme with clean typography and clear visual hierarchy makes the
+data readable and makes a strong impression on the college panel.
+Good styling turns a working prototype into something that looks
+ready to ship. This is all CSS — no libraries, no Tailwind.
+
+### Prerequisite Check
+
+- src/public/index.html must exist and be linked to style.css
+
+### Learn First — search these, 20 mins max
+
+1. css dark theme color design
+   Search: dark theme ui design colors developer tool
+   Get a sense of what good dark themes look like — contrast,
+   accent colors, card backgrounds
+
+2. css transitions hover effects buttons
+   Search: css button hover transition effect
+   Buttons should have smooth hover and active states
+
+3. css box shadow card style
+   Search: css card style dark theme box shadow
+
+### Jot Down in Notebook
+
+- Color palette to use — define all of these as CSS variables:
+  --bg-primary #0d0d0d main page background
+  --bg-secondary #1a1a1a sidebar background
+  --bg-card #242424 content card background
+  --accent #7c3aed purple — buttons and active states
+  --text-primary #ffffff main text
+  --text-secondary #888888 labels and secondary text
+  --success #22c55e green — data exists dot
+  --danger #ef4444 red — data missing dot
+  --border #2e2e2e card and panel borders
+
+- Visual hierarchy rule:
+  The most important information should be the largest and brightest
+  Secondary info should be smaller and use --text-secondary
+  Background layers should get progressively lighter:
+  page → sidebar → card → input
+
+### What to Do
+
+1. Create src/public/style.css
+2. Write a CSS reset at the top — zero margin, box-sizing border-box
+3. Define all color variables in :root
+4. Style the overall page layout using CSS Grid — sidebar fixed at
+   240px wide, content area fills the remaining space, full height
+5. Style the header — full width, border bottom, project name on right
+6. Style sidebar buttons — full width, left aligned, padding, hover
+   effect with background color change, active state with accent color
+   left border, smooth transition on all state changes
+7. Style the status dot — small circle element, green when data exists,
+   gray when missing (you will toggle a class with JS later)
+8. Style the content panels — rounded corners, bg-card background,
+   border, padding, the AI panel should have a dashed border to show
+   it is a placeholder
+9. Style the loading state — a simple animated pulsing bar or skeleton
+10. Style the empty state — centered text with a muted color and the
+    CLI command to run shown in a code-style font
+
+### You Will Know It Works When
+
+The dashboard looks clean and dark with clear visual separation
+between sidebar, data panel, and AI panel. Sidebar buttons have
+smooth hover effects. The layout holds correctly when you resize
+the browser window.
+
+---
+
+## Task 17 — Dashboard JavaScript — Core Logic
+
+### Purpose
+
+This is the brain of the dashboard. It handles all the interactivity —
+fetching data from the server, rendering it into the content panel,
+updating status dots, and managing which button is active. This is
+vanilla JavaScript doing what React would normally abstract away.
+Understanding this teaches you what React useEffect and useState
+are actually doing under the hood — fetching data, storing it, and
+updating the DOM when it changes.
+
+### Prerequisite Check
+
+- src/server/index.js must be running and all /api/\* endpoints
+  must be responding correctly before testing the dashboard JS
+- src/public/index.html and style.css must be complete
+
+### Learn First — search these, 30 mins max
+
+1. javascript fetch api async await example
+   Search: javascript fetch async await json response
+   Understand: how to fetch a URL, await the response,
+   and parse it as JSON in one async function
+
+2. javascript dom manipulation innerHTML vs createElement
+   Search: javascript innerHTML vs createElement performance
+   Understand both approaches — innerHTML is simpler for
+   building card layouts, createElement is safer
+
+3. javascript event delegation
+   Search: javascript event delegation explained
+   Understand: instead of adding a click listener to each button
+   separately, add ONE listener to the sidebar parent element
+   and check which button was clicked using event.target
+
+4. javascript classList toggle add remove
+   Search: javascript classList add remove toggle example
+   You will use this to toggle the active class on buttons
+   and the success/danger class on status dots
+
+### Jot Down in Notebook
+
+- The fetch and render pattern — memorize this, it is used everywhere:
+  Step 1: user clicks a button
+  Step 2: read button's data-section attribute
+  Step 3: fetch /api/[section] from the server
+  Step 4: if success → build HTML from the data and insert it
+  Step 5: if no data → show empty state with CLI command to run
+
+- Event delegation explained simply:
+  Bad: each of 7 buttons gets its own addEventListener — 7 listeners
+  Good: sidebar gets ONE listener, check event.target — 1 listener
+  If the clicked element has a data-section attribute it is a button
+
+- Why innerHTML for this project:
+  Building cards with createElement would be very verbose for a
+  dashboard with 6 different data shapes. Using innerHTML with
+  template literals is cleaner and readable for this use case.
+
+### What to Do
+
+1. Create src/public/app.js
+2. Write an async fetchData(section) function that:
+   - Fetches /api/[section] from the server
+   - Returns the parsed JSON response
+   - Returns null if the fetch fails for any reason
+3. Write a showLoading() function that puts a loading indicator
+   in the data panel while the fetch is in progress
+4. Write a showEmpty(section) function that shows an empty state
+   message in the data panel with the correct CLI command to run
+   for that section
+5. Write individual render functions for each section:
+   renderVision(data) — project name as heading, problem, target,
+   platform as badge, team size, created date
+   renderAnalysis(data) — risks, timeline, scale, budget as cards
+   renderStack(data) — frontend, backend, database, deployment
+   each as a labeled card
+   renderRoadmap(data) — phases as a vertical numbered timeline,
+   each with name and milestones
+   renderDecisions(data) — each decision as a card, newest first,
+   showing decision, reason, alternatives, date
+   renderProgress(data) — completion percentage as a visual bar,
+   current phase, milestones, blockers below
+6. Write a loadSection(section) function that:
+   - Calls showLoading()
+   - Calls fetchData(section)
+   - If data exists calls the correct render function
+   - If no data calls showEmpty(section)
+7. Add one click event listener to the sidebar using event delegation
+   When a sidebar button is clicked:
+   - Remove active class from all buttons
+   - Add active class to the clicked button
+   - Call loadSection with the button's data-section value
+8. Write an updateStatusDots() function that:
+   - Fetches /api/status
+   - For each section sets the dot to green or gray based on
+     whether the file exists
+9. On page load call updateStatusDots() and loadSection("vision")
+   so the dashboard is never empty when it first opens
+
+### You Will Know It Works When
+
+devarchitect dashboard opens the browser and:
+
+- Vision data loads automatically without clicking anything
+- Clicking each sidebar button loads that section's data
+- Sections without data show a clean empty state message
+- Status dots are green for sections with data and gray for empty
+- The active sidebar button is visually highlighted
+- No console errors in the browser developer tools
+
+---
+
+## Task 18 — AI Suggestions Placeholder Panel
+
+### Purpose
+
+Reserve the bottom panel in the dashboard for AI suggestions now so
+the layout is already correct when AI is added in the final year project.
+Each section gets a disabled Ask AI button that does nothing yet but
+signals to anyone looking at the dashboard that this feature is coming.
+This also makes the dashboard look more complete for the college panel.
+
+### Prerequisite Check
+
+- Task 17 must be complete and all sections rendering correctly
 
 ### Learn First
 
-Nothing new — you know React and Vite already.
-
-### What to Build
-
-1. Inside the devarchitect project root create the React app:
-   npm create vite@latest dashboard -- --template react
-   cd dashboard
-   npm install
-   npm install axios
-
-2. Add a proxy to vite.config.js so API calls go to Express:
-   server: {
-   proxy: {
-   '/api': '<http://localhost:3001>'
-   }
-   }
-
-3. Clean up the default Vite boilerplate — remove App.css content,
-   remove the default JSX in App.jsx
-
-### You Will Know It Works When
-
-cd dashboard && npm run dev
-React app runs at <http://localhost:5173> with no errors.
-
----
-
-## Task 16 — Status Page
-
-### Purpose
-
-The first page of the dashboard mirrors the devarchitect status command
-— it shows which parts of the project have been filled in and which
-are missing. This is the landing page — the first thing a developer
-sees when they open the dashboard.
-
-### Learn First — search these, 20 mins max
-
-1. react useEffect fetch api call example
-   You will fetch data from the Express server when the component loads.
-   Search: react useEffect fetch data on mount
-
-2. conditional rendering react
-   You will show a green card if data exists and a gray card if it
-   does not.
-   Search: react conditional rendering example
+Nothing new — this is HTML and CSS you already know.
 
 ### Jot Down in Notebook
 
-- What useEffect does — runs code after the component renders.
-  Used for fetching data, subscriptions, and side effects.
-- The fetch pattern in React:
-  useEffect runs → fetch /api/status → setData(result) → component re-renders
+- Why placeholder UI matters:
+  Building the placeholder now means the final year project only
+  needs to wire up the button — the layout and space is already there
+  This is called progressive enhancement — build the shell first,
+  fill it with functionality later
 
-### What to Build
+### What to Do
 
-Build a StatusPage component that:
-
-1. Fetches GET /api/status on load
-2. Shows a card for each of the 6 JSON files
-3. Green card with checkmark if file exists
-4. Gray card with cross and next command if file is missing
-5. Shows "X of 6 complete" at the bottom
+1. After each render function in app.js add a call to a function
+   renderAIPanel(section) that inserts the AI panel below the data
+2. The AI panel should show:
+   - A heading: AI Suggestions
+   - A subtext: AI integration available in the next version
+   - A button labeled Ask AI that is disabled and styled as grayed out
+3. Make the Ask AI button have a tooltip on hover that says:
+   Coming in devarchitect v2.0
+4. The AI panel should use the dashed border style from your CSS
 
 ### You Will Know It Works When
 
-The dashboard landing page shows the correct status of your
-.devarchitect/ files, matching what devarchitect status shows
-in the terminal.
+Every section in the dashboard shows the data panel on top and the
+AI suggestions panel below it with a grayed out Ask AI button.
+The button does not crash or do anything when clicked.
 
 ---
 
-## Task 17 — Vision Page
+## Task 19 — Export Button
 
 ### Purpose
 
-Displays the project vision in a clean readable format. This is what
-a new developer reads first to understand what the project is about.
+The devarchitect export CLI command generates a markdown report.
+Add an Export Report button to the dashboard header that does the
+same thing from the browser — one click downloads the full report
+without touching the terminal. This requires a new server endpoint
+that builds the markdown and sends it as a file download.
 
-### What to Build
+### Prerequisite Check
 
-A VisionPage component that:
-
-1. Fetches GET /api/vision on load
-2. Shows a loading state while fetching
-3. Shows an empty state if vision.json does not exist yet with
-   a message: "Run devarchitect init to get started"
-4. Shows the vision data in clean labeled cards:
-   - Project Name (large heading)
-   - Problem (paragraph)
-   - Target Users
-   - Platform (badge)
-   - Team Size
-   - Initialized On (formatted date)
-
----
-
-## Task 18 — Tech Stack Page
-
-### Purpose
-
-Displays the technology choices in a visual card layout.
-Each technology gets its own card.
-
-### What to Build
-
-A StackPage component that:
-
-1. Fetches GET /api/stack on load
-2. Shows each technology as a card with a label (Frontend, Backend etc)
-3. Empty state if stack not defined yet
-
----
-
-## Task 19 — Roadmap Page
-
-### Purpose
-
-Displays the project phases as a visual timeline so the developer
-can see the full execution plan at a glance.
+- src/server/index.js must be running
+- At least vision.json must exist to have content in the report
 
 ### Learn First — search these, 20 mins max
 
-1. react timeline component css
-   Build a simple vertical timeline with CSS.
-   Search: simple vertical timeline css example
+1. nodejs http response file download Content-Disposition header
+   Search: nodejs http send file download Content-Disposition
+   Understand: the Content-Disposition attachment header tells the
+   browser to download the response as a file instead of displaying it
 
-### What to Build
+2. javascript window location href trigger download
+   Search: javascript trigger file download from button click
+   The simplest way to trigger a download is setting
+   window.location.href to the download endpoint URL
 
-A RoadmapPage component that:
+### Jot Down in Notebook
 
-1. Fetches GET /api/roadmap on load
-2. Displays phases as a vertical timeline
-3. Each phase shows its name and milestones
-4. Empty state if roadmap not defined yet
+- Content-Disposition header:
+  attachment; filename="devarchitect-report.md"
+  This single header is what makes the browser download the response
+  as a file instead of showing the content in the browser tab
+  Content-Type should be text/markdown for markdown files
 
----
+### What to Do
 
-## Task 20 — Decisions Page
-
-### Purpose
-
-Displays the full decisions log as a timeline — every architectural
-decision ever made, with reasoning and date. This is the most unique
-page in the dashboard and the best demonstration of what makes
-devarchitect different from Git.
-
-### What to Build
-
-A DecisionsPage component that:
-
-1. Fetches GET /api/decisions on load
-2. Displays each decision as a timeline card showing:
-   - The decision made
-   - The reason
-   - Alternatives considered
-   - Date decided
-3. Most recent decision at the top
-4. Empty state if no decisions recorded yet
-
----
-
-## Task 21 — Progress Page
-
-### Purpose
-
-Displays current project progress — active phase, completed milestones,
-blockers, and overall completion percentage as a visual progress bar.
-
-### Learn First — search these, 20 mins max
-
-1. css progress bar example
-   Search: simple css progress bar html example
-
-### What to Build
-
-A ProgressPage component that:
-
-1. Fetches GET /api/progress on load
-2. Shows a progress bar based on completion percentage
-3. Shows current phase, completed milestones, and blockers
-4. Empty state if progress not updated yet
-
----
-
-## Task 22 — Navigation and Layout
-
-### Purpose
-
-Connect all pages together with a sidebar navigation so the dashboard
-feels like a complete application not just isolated pages.
-
-### Learn First — search these, 20 mins max
-
-1. react router dom basic example
-   Search: react router dom v6 basic routing example
-
-### What to Build
-
-1. Install react router:
-   npm install react-router-dom
-2. Build a sidebar with links to all pages:
-   - Status (home)
-   - Vision
-   - Tech Stack
-   - Roadmap
-   - Decisions
-   - Progress
-3. Active link highlighting — current page link is highlighted
-4. Project name in the sidebar header pulled from vision.json
-
----
-
-## Task 23 — Export Button in Dashboard
-
-### Purpose
-
-The export command generates a markdown report from the terminal.
-Add an Export Report button to the dashboard that does the same thing
-from the browser — calls the server which triggers the export and
-downloads the markdown file.
-
-### Learn First — search these, 20 mins max
-
-1. express trigger file download nodejs
-   Search: express res download file nodejs
-
-### What to Build
-
-1. Add GET /api/export endpoint to the Express server
-   It reads all JSON files, builds the markdown string,
-   and sends it as a file download
-2. Add an Export Report button to the dashboard header
-   that calls this endpoint and downloads the file
-
----
-
-## Task 24 — Connect dashboard command to React build
-
-### Purpose
-
-Right now the React app runs separately on port 5173 during development.
-For the final submission the Express server should serve the React build
-directly so everything runs on one port with one command.
-
-### What to Build
-
-1. Build the React app:
-   cd dashboard && npm run build
-2. Update src/server/index.js to serve the dashboard/dist folder
-   as static files
-3. Update devarchitect dashboard command to open <http://localhost:3001>
-4. Test that devarchitect dashboard opens the full working UI
+1. Add a new route GET /api/export to src/server/index.js
+   It should read all JSON files that exist, build the same
+   markdown string that the CLI export command produces,
+   set Content-Type to text/markdown and Content-Disposition to
+   attachment with filename devarchitect-report.md, then send
+   the markdown string as the response body
+2. Add an Export Report button to the header in index.html
+3. In app.js add a click listener to the export button that
+   sets window.location.href to /api/export
 
 ### You Will Know It Works When
 
-devarchitect dashboard
-Opens the browser and the full React dashboard loads at
-<http://localhost:3001> with all pages working — served entirely
-by the Express server, no separate Vite dev server needed.
+Clicking the Export Report button in the dashboard header
+downloads devarchitect-report.md to your downloads folder
+with all project sections filled in correctly.
+
+---
+
+## Task 20 — Project Name in Header
+
+### Purpose
+
+The header currently shows just the word devarchitect. Pull the
+actual project name from vision.json and display it in the header
+so the dashboard feels specific to the current project, not generic.
+Small detail, big impact on how polished it feels.
+
+### Prerequisite Check
+
+- vision.json must exist with a projectname field
+
+### Learn First
+
+Nothing new — you already know how to fetch /api/vision and read
+a value from the response.
+
+### What to Do
+
+1. On page load fetch /api/vision
+2. If vision data exists read the projectname field
+3. Update the header element that shows the project name placeholder
+   with the actual project name using JavaScript DOM manipulation
+
+### You Will Know It Works When
+
+The dashboard header shows the actual name of your project
+next to the devarchitect logo text.
+
+---
+
+## Task 21 — End to End Test
+
+### Purpose
+
+Before calling the mini project done, test everything together from
+scratch. Delete all stored data and run every command in order,
+checking the dashboard after each one. This is your own QA pass —
+find and fix anything that does not work before submission.
+
+### Prerequisite Check
+
+None — this task is the final check of everything.
+
+### Learn First
+
+Nothing — this is testing, not building.
+
+### What to Do
+
+1. Stop the server if it is running
+2. Delete .devarchitect/ completely: rm -rf .devarchitect
+3. Run each command in order and after each one open the dashboard
+   to verify the correct section updated:
+   devarchitect init → check Vision section shows data
+   devarchitect analyze → check Analysis section shows data
+   devarchitect stack → check Stack section shows data
+   devarchitect roadmap → check Roadmap section shows data
+   devarchitect decision → check Decisions section shows data
+   devarchitect decision → run again — check TWO decisions appear
+   devarchitect progress → check Progress section shows data
+4. Check status dots — all 6 should be green
+5. Run devarchitect status in terminal — should match dashboard dots
+6. Run devarchitect export in terminal — check report file is complete
+7. Click Export Report button in dashboard — check file downloads
+8. Run devarchitect dashboard on a fresh terminal — check browser
+   opens automatically and all data is visible
+9. Try running devarchitect roadmap before devarchitect analyze —
+   check that it warns you and exits instead of crashing
+10. Try running devarchitect init in a folder that already has
+    .devarchitect/ — check that it warns and does not overwrite
+
+### You Will Know It Works When
+
+All 10 checks pass without errors or unexpected behavior.
+The dashboard looks professional and complete.
+Everything works with just devarchitect dashboard as the entry point.
 
 ---
 
 ## Mini Project Complete 🎉
+
+After Task 21 you have a fully working submission:
+
+CLI — 7 commands with workflow enforcement and versioning
+Server — Node http module, zero extra dependencies
+Dashboard — vanilla HTML CSS JS control panel
+
+One command opens everything:
+devarchitect dashboard
+
+---
+
+## What Comes Next — Final Year Project
+
+Task 22 — AI API integration — Ask AI buttons become real
+Task 23 — Python microservice for smart stack recommendations  
+Task 24 — Go service for fast JSON processing
+Task 25 — Team collaboration features
+Task 26 — Rewrite CLI core in Go — this becomes arc# Mini Project Complete 🎉
 
 After Task 24 you have:
 
