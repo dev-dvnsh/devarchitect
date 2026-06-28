@@ -3,7 +3,6 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 import { backupIfExist } from "../utils.js";
-import { exit } from "process";
 
 async function init() {
   const projectroot = process.cwd();

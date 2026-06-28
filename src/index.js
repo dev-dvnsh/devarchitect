@@ -9,6 +9,7 @@ import { stack } from "./commands/stack.js";
 import { roadmap } from "./commands/roadmap.js";
 import { decision } from "./commands/decision.js";
 import { progress } from "./commands/progress.js";
+import { status } from "./commands/status.js";
 
 // const args = process.argv.slice(2);
 
@@ -61,4 +62,8 @@ program
     "Asks the programmer questions related to the roadmap to record progress and blockers to progress",
   )
   .action(progress);
+program
+  .command("status")
+  .description("Gives a quick health check for devarchitect setup")
+  .action(status);
 program.parse();

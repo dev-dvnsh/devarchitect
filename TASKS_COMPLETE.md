@@ -278,7 +278,7 @@ Project: devarchitect
 ─────────────────────────────
 ✔ vision.json — initialized
 ✔ analysis.json — analyzed
-✔ techstack.json — stack defined
+✔ stack.json — stack defined
 ✗ roadmap.json — run devarchitect roadmap
 ✗ decisions.json — run devarchitect decision
 ✗ progress.json — run devarchitect progress
