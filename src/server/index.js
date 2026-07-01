@@ -35,7 +35,7 @@ const server = http.createServer((req, res) => {
         const htmlFileData = fs.readFileSync(htmlPath);
         res.end(htmlFileData);
       } else {
-        res.end({ success: false, message: "html not found" });
+        res.end(JSON.stringify({ success: false, message: "html not found" }));
       }
     } catch (err) {
       console.log(err);
@@ -126,16 +126,10 @@ const server = http.createServer((req, res) => {
       console.log(err);
     }
   } else {
-    res.writeHead(404, {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
+    sendJson(res, 404, {
+      success: false,
+      message: "Route not found",
     });
-    res.end(
-      JSON.stringify({
-        success: false,
-        message: "Route not found",
-      }),
-    );
   }
 });
 
