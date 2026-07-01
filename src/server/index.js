@@ -2,13 +2,6 @@ import path from "path";
 import fs from "fs";
 import http from "http";
 
-function pathMaker(filename) {
-  const projectRoot = process.cwd();
-  const devarchitectDir = path.join(projectRoot, ".devarchitect");
-  const filePath = path.join(devarchitectDir, `${filename}`);
-  return filePath;
-}
-
 function readJson(filename) {
   const projectRoot = process.cwd();
   const devarchitectDir = path.join(projectRoot, ".devarchitect");
@@ -16,26 +9,33 @@ function readJson(filename) {
   if (fs.existsSync(filePath)) {
     const fileData = fs.readFileSync(filePath);
     const parsedFileData = JSON.parse(fileData);
-    return parsedFileData;
+    return { filePath, parsedFileData };
   } else {
     return null;
   }
 }
 
-const server = http.createServer((req, res) => {
-  console.log(req.url);
+function sendJson(res, statusCode, data) {
+  res.writeHead(statusCode, {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  });
+  res.end(JSON.stringify(data));
+}
 
+const server = http.createServer((req, res) => {
   if (req.url == "/api/status" || req.url == "/api/status/") {
     try {
+      res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Content-Type", "application/json");
       res.statusCode = 200;
 
-      const isVision = fs.existsSync(pathMaker("vision.json"));
-      const isAnalyse = fs.existsSync(pathMaker("analyse.json"));
-      const isStack = fs.existsSync(pathMaker("stack.json"));
-      const isRoadmap = fs.existsSync(pathMaker("roadmap.json"));
-      const isDecisions = fs.existsSync(pathMaker("decisions.json"));
-      const isProgress = fs.existsSync(pathMaker("progress.json"));
+      const isVision = fs.existsSync(readJson("vision.json").filePath);
+      const isAnalyse = fs.existsSync(readJson("analyse.json").filePath);
+      const isStack = fs.existsSync(readJson("stack.json").filePath);
+      const isRoadmap = fs.existsSync(readJson("roadmap.json").filePath);
+      const isDecisions = fs.existsSync(readJson("decisions.json").filePath);
+      const isProgress = fs.existsSync(readJson("progress.json").filePath);
 
       const toSend = {
         "visioin.json": isVision,
@@ -51,73 +51,69 @@ const server = http.createServer((req, res) => {
     }
   } else if (req.url == "/api/vision" || req.url == "/api/vision/") {
     try {
-      res.setHeader("Content-Type", "application/json");
-      res.statusCode = 200;
-
-      const data = readJson("vision.json");
-
-      res.end(JSON.stringify(data));
+      sendJson(res, 200, {
+        success: true,
+        data: readJson("vision.json").parsedFileData,
+      });
     } catch (err) {
       console.log(err);
     }
   } else if (req.url == "/api/analyse" || req.url == "/api/analyse/") {
     try {
-      res.setHeader("Content-Type", "application/json");
-      res.statusCode = 200;
-
-      const data = readJson("analyse.json");
-
-      res.end(JSON.stringify(data));
+      sendJson(res, 200, {
+        success: true,
+        data: readJson("analyse.json").parsedFileData,
+      });
     } catch (err) {
       console.log(err);
     }
   } else if (req.url == "/api/stack" || req.url == "/api/stack/") {
     try {
-      res.setHeader("Content-Type", "application/json");
-      res.statusCode = 200;
-
-      const data = readJson("stack.json");
-
-      res.end(JSON.stringify(data));
+      sendJson(res, 200, {
+        success: true,
+        data: readJson("stack.json").parsedFileData,
+      });
     } catch (err) {
       console.log(err);
     }
   } else if (req.url == "/api/roadmap" || req.url == "/api/roadmap/") {
     try {
-      res.setHeader("Content-Type", "application/json");
-      res.statusCode = 200;
-
-      const data = readJson("roadmap.json");
-
-      res.end(JSON.stringify(data));
+      sendJson(res, 200, {
+        success: true,
+        data: readJson("roadmap.json").parsedFileData,
+      });
     } catch (err) {
       console.log(err);
     }
   } else if (req.url == "/api/decisions" || req.url == "/api/decisions/") {
     try {
-      res.setHeader("Content-Type", "application/json");
-      res.statusCode = 200;
-
-      const data = readJson("decisions.json");
-
-      res.end(JSON.stringify(data));
+      sendJson(res, 200, {
+        success: true,
+        data: readJson("decisions.json").parsedFileData,
+      });
     } catch (err) {
       console.log(err);
     }
   } else if (req.url == "/api/progress" || req.url == "/api/progress/") {
     try {
-      res.setHeader("Content-Type", "application/json");
-      res.statusCode = 200;
-
-      const data = readJson("progress.json");
-
-      res.end(JSON.stringify(data));
+      sendJson(res, 200, {
+        success: true,
+        data: readJson("progress.json").parsedFileData,
+      });
     } catch (err) {
       console.log(err);
     }
   } else {
-    res.statusCode = 404;
-    res.end();
+    res.writeHead(404, {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    });
+    res.end(
+      JSON.stringify({
+        success: false,
+        message: "Route not found",
+      }),
+    );
   }
 });
 
