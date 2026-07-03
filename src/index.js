@@ -10,6 +10,7 @@ import { roadmap } from "./commands/roadmap.js";
 import { decision } from "./commands/decision.js";
 import { progress } from "./commands/progress.js";
 import { status } from "./commands/status.js";
+import { dashboard } from "./commands/dashboard.js";
 
 // const args = process.argv.slice(2);
 
@@ -66,4 +67,10 @@ program
   .command("status")
   .description("Gives a quick health check for devarchitect setup")
   .action(status);
+program
+  .command("dashboard")
+  .description(
+    "serve all the devarchitect json files from current project to the default browser",
+  )
+  .action(dashboard);
 program.parse();

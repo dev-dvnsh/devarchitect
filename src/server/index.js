@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "fs";
 import http from "http";
+import chalk from "chalk";
 
 function readJson(filename) {
   const projectRoot = process.cwd();
@@ -39,6 +40,17 @@ const server = http.createServer((req, res) => {
       }
     } catch (err) {
       console.log(err);
+    }
+  } else if (req.url.endsWith(".css") || req.url.endsWith(".js")) {
+    const filePath = path.join(process.cwd(), "src", "public", req.url);
+    if (fs.existsSync(filePath)) {
+      const ext = req.url.endsWith(".css")
+        ? "text/css"
+        : "application/javascript";
+      res.writeHead(200, { "Content-Type": ext });
+      res.end(fs.readFileSync(filePath));
+    } else {
+      sendJson(res, 404, { success: false, message: "File not found" });
     }
   } else if (req.url == "/api/status" || req.url == "/api/status/") {
     try {
@@ -134,6 +146,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(3001, () => {
-  const { address, port } = server.address();
-  console.log(`Server is listening on http://${address}:${port}`);
+  console.log(chalk.yellow(`Server is listening on http://localhost:3001`));
 });

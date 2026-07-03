@@ -753,6 +753,43 @@ updating the DOM when it changes.
 9. On page load call updateStatusDots() and loadSection("vision")
    so the dashboard is never empty when it first opens
 
+-- alternative if you dont know what to do
+
+<!-- app.js — What to Build -->
+<!-- Step 1 — Base URL variable -->
+<!-- At the top of the file store the server address in a variable called BASE_URL. You will use this in every fetch call instead of typing the full URL every time. -->
+
+<!-- Step 2 — fetchData function -->
+<!-- Write an async function called fetchData that takes a section name as parameter. Inside it use fetch to call BASE_URL + "/api/" + section. Await the response, then await converting it to JSON, then return it. Wrap the whole thing in a try catch — if anything goes wrong return null instead of crashing. -->
+
+<!-- Step 3 — showLoading function -->
+<!-- Write a function called showLoading. It should find the data-panel element by its id and set its innerHTML to a simple paragraph that says "Loading...". This will show while the fetch is happening. -->
+
+<!-- Step 4 — showEmpty function -->
+<!-- Write a function called showEmpty that takes a section name as parameter. It should find the data-panel and set its innerHTML to two things — a paragraph saying "No data found" and below it a small text showing which CLI command to run. For example if section is "vision" the command is "devarchitect init". You will need an if/else or a lookup object to map each section to its command. -->
+
+Step 5 — Six render functions
+Write one function for each section. Each function takes data as a parameter and sets the innerHTML of data-panel to show the data nicely. Keep it simple — use a heading for the section name and paragraphs or small divs for each field. Here is what each one shows:
+
+renderVision — project name as a big heading, then problem, target, platform, team size, created date each on their own line
+renderAnalysis — risks, timeline, scale, budget each on their own line
+renderStack — frontend, backend, database, deployment each on their own line
+renderRoadmap — loop through the phases array and show each phase number, name, and milestones one after another
+renderDecisions — loop through the decisions array and show each decision, reason, alternatives, and date. Show newest first by reversing the array before looping
+renderProgress — show a paragraph for completion percentage, current phase, milestones, and blockers
+
+Step 6 — loadSection function
+Write an async function called loadSection that takes a section name. First call showLoading. Then call fetchData with that section and await the result. Check if the result exists and if result.success is true — if yes call the correct render function passing result.data. If no call showEmpty with the section name. Use an if else chain or a lookup object to decide which render function to call based on the section name.
+
+Step 7 — Click listener on sidebar
+Find the aside element. Add one click event listener to it. Inside the listener check if the clicked element is a button — use event.target and check if its tag name is BUTTON. If yes do three things — remove the active class from all buttons, add the active class to the clicked button, then call loadSection with the clicked button's dataset.section value.
+
+Step 8 — updateStatusDots function
+Write an async function called updateStatusDots. Inside it call fetchData with "status" and await the result. If the result is null or success is false just return. Otherwise loop through all the aside buttons — for each button get its data-section value, find its dot span, check if the matching file exists in result.data, if yes add the success class to the dot, if no remove it.
+
+Step 9 — Run on page load
+At the very bottom of the file outside all functions call two things — updateStatusDots() and loadSection with "vision". This makes sure the dashboard is never empty when it first opens.
+
 ### You Will Know It Works When
 
 devarchitect dashboard opens the browser and:

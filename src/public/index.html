@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Devarchitect</title>
+    <link href="style.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header>
+      <span id="app-name">Devarchitect</span>
+      <span id="project-name">No project loaded</span>
+    </header>
+    <aside id="aside">
+      <p id="sidebar-title">Commands</p>
+      <button data-section="vision"><span class="dot"></span>Vision</button>
+      <button data-section="analyse"><span class="dot"></span>Analyse</button>
+      <button data-section="stack"><span class="dot"></span>Stack</button>
+      <button data-section="roadmap"><span class="dot"></span>Roadmap</button>
+      <button data-section="decisions">
+        <span class="dot"></span>Decisions
+      </button>
+      <button data-section="progress"><span class="dot"></span>Progress</button>
+      <button data-section="export"><span class="dot"></span>Export</button>
+    </aside>
+
+    <main>
+      <div id="data-panel">
+        <p>Project Data</p>
+      </div>
+      <div id="ai-panel">
+        <p>AI Suggestions</p>
+      </div>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
