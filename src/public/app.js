@@ -25,11 +25,12 @@ function showEmpty(section) {
     progress: "progress",
     // export: "export",
   };
-  elem.innerHTML = `<p>No data found</p><br/><p>run devarchitect ${commandObj[section]}</p>`;
+  elem.innerHTML = `<p>No data found</p><br/><code>run devarchitect ${commandObj[section]}</code>`;
 }
 
 function renderVision(data) {
   const elem = document.getElementById("data-panel");
+  document.getElementById("project-name").textContent = data.projectname;
   elem.innerHTML = `
   <div class="field"><span class="label">Project Name</span><span>${data.projectname}</span></div>
   <div class="field"><span class="label">Problem</span><span>${data.problem}</span></div>
@@ -168,7 +169,7 @@ async function updateStatusDots() {
     // Safety check: ensure the button actually has a dot span and a section value
     if (dotSpan && sectionName) {
       // Check if the section key exists in the result.data object
-      const fileExists = sectionName in result.data;
+      const fileExists = `${sectionName}.json` in result.data;
 
       if (fileExists) {
         // If file exists, ensure it has the success class
