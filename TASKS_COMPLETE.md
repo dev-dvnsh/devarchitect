@@ -768,15 +768,15 @@ updating the DOM when it changes.
 <!-- Step 4 — showEmpty function -->
 <!-- Write a function called showEmpty that takes a section name as parameter. It should find the data-panel and set its innerHTML to two things — a paragraph saying "No data found" and below it a small text showing which CLI command to run. For example if section is "vision" the command is "devarchitect init". You will need an if/else or a lookup object to map each section to its command. -->
 
-Step 5 — Six render functions
-Write one function for each section. Each function takes data as a parameter and sets the innerHTML of data-panel to show the data nicely. Keep it simple — use a heading for the section name and paragraphs or small divs for each field. Here is what each one shows:
+<!-- Step 5 — Six render functions -->
+<!-- Write one function for each section. Each function takes data as a parameter and sets the innerHTML of data-panel to show the data nicely. Keep it simple — use a heading for the section name and paragraphs or small divs for each field. Here is what each one shows: -->
 
-renderVision — project name as a big heading, then problem, target, platform, team size, created date each on their own line
-renderAnalysis — risks, timeline, scale, budget each on their own line
-renderStack — frontend, backend, database, deployment each on their own line
-renderRoadmap — loop through the phases array and show each phase number, name, and milestones one after another
-renderDecisions — loop through the decisions array and show each decision, reason, alternatives, and date. Show newest first by reversing the array before looping
-renderProgress — show a paragraph for completion percentage, current phase, milestones, and blockers
+<!-- renderVision — project name as a big heading, then problem, target, platform, team size, created date each on their own line -->
+<!-- renderAnalysis — risks, timeline, scale, budget each on their own line -->
+<!-- renderStack — frontend, backend, database, deployment each on their own line -->
+<!-- renderRoadmap — loop through the phases array and show each phase number, name, and milestones one after another -->
+<!-- renderDecisions — loop through the decisions array and show each decision, reason, alternatives, and date. Show newest first by reversing the array before looping -->
+<!-- renderProgress — show a paragraph for completion percentage, current phase, milestones, and blockers -->
 
 Step 6 — loadSection function
 Write an async function called loadSection that takes a section name. First call showLoading. Then call fetchData with that section and await the result. Check if the result exists and if result.success is true — if yes call the correct render function passing result.data. If no call showEmpty with the section name. Use an if else chain or a lookup object to decide which render function to call based on the section name.
@@ -840,6 +840,39 @@ Nothing new — this is HTML and CSS you already know.
 3. Make the Ask AI button have a tooltip on hover that says:
    Coming in devarchitect v2.0
 4. The AI panel should use the dashed border style from your CSS
+
+Step 1 — Fill renderAIPanel
+You already have the function but innerHTML is empty. Set it to three things stacked vertically:
+
+A heading tag saying "AI Suggestions"
+A paragraph saying "AI integration available in the next version"
+A button saying "Ask AI"
+
+Step 2 — Disable the button
+HTML buttons have a disabled attribute — just add the word disabled inside the button tag in your template literal:
+html<button disabled>Ask AI</button>
+That's it — the button becomes unclickable automatically.
+
+Step 3 — Add a tooltip
+HTML elements have a title attribute — when you hover over the element the browser shows it as a small popup. Add it to the button:
+html<button disabled title="Coming in devarchitect v2.0">Ask AI</button>
+
+Step 4 — Style the disabled button in CSS
+Add this to your style.css:
+css#ai-panel button:disabled {
+opacity: 0.4;
+cursor: not-allowed;
+}
+
+Step 5 — Call renderAIPanel after every render function
+At the end of renderVision, renderAnalyse, renderStack, renderRoadmap, renderDecisions, renderProgress — add one line:
+javascriptrenderAIPanel(section)
+But wait — your render functions don't receive section as a parameter right now. You have two options:
+
+Add section as a second parameter to each render function
+Or just call renderAIPanel() without a parameter since it doesn't actually use it yet
+
+Go with the simpler option for now. Just call renderAIPanel() at the end of each render function.
 
 ### You Will Know It Works When
 

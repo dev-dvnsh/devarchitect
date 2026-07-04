@@ -113,6 +113,14 @@ function renderProgress(data) {
 `;
 }
 
+function renderAIPanel(section) {
+  const elem = document.getElementById("ai-panel");
+  elem.innerHTML = `
+
+
+`;
+}
+
 async function loadSection(section) {
   showLoading();
   const result = await fetchData(section);
@@ -180,6 +188,14 @@ async function updateStatusDots() {
       }
     }
   });
+}
+function renderAIPanel() {
+  const elem = document.getElementById("ai-panel");
+  elem.innerHTML = `
+    <h3>AI Suggestions</h3>
+    <p>AI integration available in the next version</p>
+    <button disabled title="Coming in devarchitect v2.0">Ask AI</button>
+  `;
 }
 
 updateStatusDots();
