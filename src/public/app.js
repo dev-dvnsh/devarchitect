@@ -13,6 +13,10 @@ function showLoading() {
   const elem = document.getElementById("data-panel");
   elem.innerHTML = "Loading...";
 }
+function showExport() {
+  const elem = document.getElementById("data-panel");
+  elem.innerHTML = "Devarchitect Report Downloaded";
+}
 
 function showEmpty(section) {
   const elem = document.getElementById("data-panel");
@@ -133,8 +137,10 @@ async function loadSection(section) {
   const result = await fetchData(section);
   if (section === "export") {
     window.location.href = BASE_URL + "/api/export";
+    showExport();
     return;
   }
+  console.log(section);
   const commandObj = {
     vision: renderVision,
     analyse: renderAnalyse,
@@ -142,7 +148,7 @@ async function loadSection(section) {
     roadmap: renderRoadmap,
     decisions: renderDecisions,
     progress: renderProgress,
-    // export: "export",
+    // export: renderExport,
   };
   if (result.success) {
     return commandObj[section](result.data);
@@ -172,6 +178,7 @@ asideElem.addEventListener("click", (event) => {
 async function updateStatusDots() {
   // 1. Call fetchData with the string "status" and await the result
   const result = await fetchData("status");
+
   // 2. Early return if result is null, or if success is missing/false
   if (!result || !result.success) {
     return;
@@ -187,8 +194,13 @@ async function updateStatusDots() {
 
     // Safety check: ensure the button actually has a dot span and a section value
     if (dotSpan && sectionName) {
+      fileExists = false;
+      if (sectionName == "export") {
+        fileExists = "vision.json" in result.data;
+      } else {
+        fileExists = `${sectionName}.json` in result.data;
+      }
       // Check if the section key exists in the result.data object
-      const fileExists = `${sectionName}.json` in result.data;
 
       if (fileExists) {
         // If file exists, ensure it has the success class
@@ -196,6 +208,9 @@ async function updateStatusDots() {
       } else {
         // If file doesn't exist, strip the success class
         dotSpan.classList.remove("success");
+      }
+      if ("vision.json" in result) {
+        exportBtn.classList.add("success");
       }
     }
   });

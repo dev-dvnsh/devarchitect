@@ -1,0 +1,14 @@
+[
+  {
+    "what": "to use json ",
+    "why": "json is fast and will make the project context decenterized and distributable ",
+    "alternatives": "mongodb, text files",
+    "decidedAt": "2026-07-06T13:32:22.409Z"
+  },
+  {
+    "what": "to use node js ",
+    "why": "familarity and easy syntax",
+    "alternatives": "go, c",
+    "decidedAt": "2026-07-06T13:37:24.922Z"
+  }
+]

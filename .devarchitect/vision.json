@@ -1,0 +1,8 @@
+{
+  "projectname": "devarchitect",
+  "problem": "helps developers manage project across different sessions can help remembering the progress stack and decesions made so far",
+  "target": "developers",
+  "platform": "cli",
+  "teamsize": 1,
+  "createdat": "2026-07-06T13:28:31.754Z"
+}

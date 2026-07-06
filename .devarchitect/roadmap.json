@@ -1,0 +1,26 @@
+{
+  "phaseArray": [
+    {
+      "phase": "1",
+      "name": "cli",
+      "milestones": [
+        "init",
+        "analyse",
+        "stack",
+        "roadmap",
+        "progress",
+        "status",
+        "export",
+        "dashboard"
+      ]
+    },
+    {
+      "phase": "2",
+      "name": "server",
+      "milestones": [
+        "working dashboard"
+      ]
+    }
+  ],
+  "createdAt": "2026-07-06T13:31:29.946Z"
+}
