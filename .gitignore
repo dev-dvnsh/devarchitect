@@ -5,6 +5,7 @@ TASKS.md
 TASKS_COMPLETE.md
 tofix.md
 *.log
+.devarchitect/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
