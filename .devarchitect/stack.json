@@ -1,8 +1,8 @@
 {
-  "frontend": "react",
+  "frontend": "inquirer",
   "backend": "node",
-  "database": "mongo",
+  "database": "none",
   "deployment": "Other",
-  "tools": "no",
-  "createdAt": "2026-04-11T12:35:43.884Z"
+  "tools": "none",
+  "createdAt": "2026-07-06T13:30:30.234Z"
 }

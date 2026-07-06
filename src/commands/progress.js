@@ -15,9 +15,15 @@ async function progress() {
 
   const roadmapData = JSON.parse(fs.readFileSync(roadmapPath, "utf-8"));
   const phaseChoices = roadmapData.phaseArray.map((p) => p.name);
-  const progressFileArray = JSON.parse(fs.readFileSync(progressPath, "utf-8"));
-  const countForProgressElem = progressFileArray.length + 1;
-  console.log(countForProgressElem);
+  let countForProgressElem;
+  if (fs.existsSync(progressPath)) {
+    const progressFileArray = JSON.parse(
+      fs.readFileSync(progressPath, "utf-8"),
+    );
+    countForProgressElem = progressFileArray.length + 1;
+  } else {
+    countForProgressElem = 0;
+  }
 
   const { currentPhase } = await inquirer.prompt([
     {
