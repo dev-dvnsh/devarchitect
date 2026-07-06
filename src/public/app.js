@@ -37,8 +37,9 @@ function renderVision(data) {
   <div class="field"><span class="label">Target</span><span>${data.target}</span></div>
   <div class="field"><span class="label">Platform</span><span>${data.platform}</span></div>
   <div class="field"><span class="label">Team Size</span><span>${data.teamsize}</span></div>
-  <div class="field"><span class="label">Created At</span><span>${data.createdat}</span></div>
+  <div class="field"><span class="label">Created At</span><span>${new Date(data.createdat).toLocaleString()}</span></div>
 `;
+  renderAIPanel();
 }
 
 function renderAnalyse(data) {
@@ -48,8 +49,9 @@ function renderAnalyse(data) {
   <div class="field"><span class="label">Timeline</span><span>${data.timeline}</span></div>
   <div class="field"><span class="label">Scale</span><span>${data.scale}</span></div>
   <div class="field"><span class="label">Budget</span><span>${data.budget}</span></div>
-  <div class="field"><span class="label">Created At</span><span>${data.createdat}</span></div>
+  <div class="field"><span class="label">Created At</span><span>${new Date(data.createdat).toLocaleString()}</span></div>
 `;
+  renderAIPanel();
 }
 function renderStack(data) {
   const elem = document.getElementById("data-panel");
@@ -59,8 +61,9 @@ function renderStack(data) {
   <div class="field"><span class="label">Database</span><span>${data.database}</span></div>
   <div class="field"><span class="label">Deployment</span><span>${data.deployment}</span></div>
   <div class="field"><span class="label">Tools</span><span>${data.tools}</span></div>
-  <div class="field"><span class="label">Created At</span><span>${data.createdat}</span></div>
+  <div class="field"><span class="label">Created At</span><span>${new Date(data.createdAt).toLocaleString()}</span></div>
 `;
+  renderAIPanel();
 }
 
 function renderRoadmap(data) {
@@ -81,8 +84,9 @@ function renderRoadmap(data) {
       )
       .join("") +
     `
-  <div class="field"><span class="label">Created At</span><span>${data.createdat}</span></div>
+  <div class="field"><span class="label">Created At</span><span>${new Date(data.createdAt).toLocaleString()}</span></div>
 `;
+  renderAIPanel();
 }
 
 function renderDecisions(data) {
@@ -95,10 +99,11 @@ function renderDecisions(data) {
   <div class="field"><span class="label">What</span><span>${decision.what}</span></div>
   <div class="field"><span class="label">Why</span><span>${decision.why}</span></div>
   <div class="field"><span class="label">Alternatives</span><span>${decision.alternatives}</span></div>
-  <div class="field"><span class="label">Decided At</span><span>${decision.decidedAt}</span></div>
+  <div class="field"><span class="label">Decided At</span><span>${new Date(decision.decidedAt).toLocaleString()}</span></div>
 `,
     )
     .join("");
+  renderAIPanel();
 }
 
 function renderProgress(data) {
@@ -109,16 +114,18 @@ function renderProgress(data) {
   <div class="field"><span class="label">Completed Milestones</span><span>${data[data.length - 1].completedMilestones.join(", ")}</span></div>
   <div class="field"><span class="label">Blockers</span><span>${data[data.length - 1].blockers}</span></div>
   <div class="field"><span class="label">Completion</span><span>${data[data.length - 1].completion}</span></div>
-  <div class="field"><span class="label">Recorded At</span><span>${data[data.length - 1].recordedAt}</span></div>
+  <div class="field"><span class="label">Recorded At</span><span>${new Date(data[data.length - 1].recordedAt).toLocaleString()}</span></div>
 `;
+  renderAIPanel();
 }
 
-function renderAIPanel(section) {
+function renderAIPanel() {
   const elem = document.getElementById("ai-panel");
   elem.innerHTML = `
-
-
-`;
+    <h3>AI Suggestions</h3>
+    <p>AI integration available in the next version</p>
+    <button disabled title="Coming in devarchitect v2.0">Ask AI</button>
+  `;
 }
 
 async function loadSection(section) {
@@ -188,14 +195,6 @@ async function updateStatusDots() {
       }
     }
   });
-}
-function renderAIPanel() {
-  const elem = document.getElementById("ai-panel");
-  elem.innerHTML = `
-    <h3>AI Suggestions</h3>
-    <p>AI integration available in the next version</p>
-    <button disabled title="Coming in devarchitect v2.0">Ask AI</button>
-  `;
 }
 
 updateStatusDots();

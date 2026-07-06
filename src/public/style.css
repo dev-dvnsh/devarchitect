@@ -120,6 +120,40 @@ aside button.active {
   color: var(--text-secondary);
 }
 
+/* AI panel heading */
+#ai-panel h3 {
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+/* AI panel subtext */
+#ai-panel p {
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+/* Ask AI disabled button */
+#ai-panel button:disabled {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-family: monospace;
+  font-size: 13px;
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* data panel heading if you add one later */
+#data-panel .field:first-child {
+  padding-top: 0;
+}
+
 #data-panel p,
 #ai-panel p {
   font-size: 13px;
