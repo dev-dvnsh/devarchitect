@@ -131,6 +131,10 @@ function renderAIPanel() {
 async function loadSection(section) {
   showLoading();
   const result = await fetchData(section);
+  if (section === "export") {
+    window.location.href = BASE_URL + "/api/export";
+    return;
+  }
   const commandObj = {
     vision: renderVision,
     analyse: renderAnalyse,
