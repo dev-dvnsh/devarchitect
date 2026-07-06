@@ -7,7 +7,7 @@ function checkPrereq(filename, commandName) {
   const devarchitectdir = path.join(projectroot, ".devarchitect");
   const filePath = path.join(devarchitectdir, filename);
   if (!fs.existsSync(filePath)) {
-    console.log(chalk.red(`Please run devarchitech ${commandName} first`));
+    console.log(chalk.red(`Please run devarchitect ${commandName} first`));
     process.exit();
   }
 }
