@@ -2,7 +2,7 @@
 logs
 devarchitect-report.md
 TASKS.md
-TASK_COMPLETE.md
+TASKS_COMPLETE.md
 tofix.md
 *.log
 npm-debug.log*
