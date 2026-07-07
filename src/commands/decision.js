@@ -6,7 +6,6 @@ import { checkPrereq } from "../utils.js";
 async function decision() {
   const rootDir = process.cwd();
   const devarchitectDir = path.join(rootDir, ".devarchitect");
-  const visionPath = path.join(devarchitectDir, "vision.json");
   const decisionsPath = path.join(devarchitectDir, "decisions.json");
   checkPrereq("vision.json", "init");
 
@@ -14,17 +13,17 @@ async function decision() {
     {
       type: "input",
       name: "what",
-      message: "What was the decision?\n",
+      message: "What was the decision?",
     },
     {
       type: "input",
       name: "why",
-      message: "Why was the decision made?\n",
+      message: "Why was the decision made?",
     },
     {
       type: "input",
       name: "alternatives",
-      message: "What alternatives were considered?\n",
+      message: "What alternatives were considered?",
     },
   ]);
   // check if file exists and read it, otherwise start fresh
@@ -46,9 +45,7 @@ async function decision() {
   );
 
   console.log(
-    chalk.yellow(
-      "Decision recorded.\nAppended to .devarchitect/decisions.json",
-    ),
+    chalk.green("Decision recorded.\nAppended to .devarchitect/decisions.json"),
   );
 }
 

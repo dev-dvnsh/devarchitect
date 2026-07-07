@@ -2,17 +2,12 @@ import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
-import { checkPrereq, backupIfExist } from "../utils.js";
+import { checkPrereq, backupIfExists } from "../utils.js";
 
 async function analyse() {
   const projectroot = process.cwd();
   const devarchitectdir = path.join(projectroot, ".devarchitect");
-  const visionPath = path.join(devarchitectdir, "vision.json");
-  const commandPreReq = "init";
-  checkPrereq("vision.json", commandPreReq);
-  const visionFileData = fs.readFileSync(visionPath, "utf-8");
-  const data = JSON.parse(visionFileData);
-  console.log(chalk.yellow(`Analysing project: ${data.projectname}`));
+  checkPrereq("vision.json", "init");
   const answers = await inquirer.prompt([
     {
       type: "input",
@@ -38,18 +33,18 @@ async function analyse() {
       choices: ["low", "medium", "high"],
     },
   ]);
-  const analyse = {
+  const analyseData = {
     ...answers,
     createdat: new Date().toISOString(),
   };
 
-  const analysestring = JSON.stringify(analyse, null, 2);
+  const analyseString = JSON.stringify(analyseData, null, 2);
   const analysePath = path.join(devarchitectdir, "analyse.json");
-  backupIfExist(analysePath, "analyse");
+  backupIfExists(analysePath, "analyse");
 
-  fs.writeFileSync(analysePath, analysestring, "utf-8");
+  fs.writeFileSync(analysePath, analyseString, "utf-8");
 
-  console.log(chalk.yellow("Saved to .devarchitect/analyse.json"));
+  console.log(chalk.green("Saved to .devarchitect/analyse.json"));
 }
 
 export { analyse };

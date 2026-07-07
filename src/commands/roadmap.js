@@ -3,14 +3,11 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 
-import { checkPrereq, backupIfExist } from "../utils.js";
+import { checkPrereq, backupIfExists } from "../utils.js";
 
 async function roadmap() {
   const rootDir = process.cwd();
   const devarchitectDir = path.join(rootDir, ".devarchitect");
-  const visionPath = path.join(devarchitectDir, "vision.json");
-  const analysePath = path.join(devarchitectDir, "analyse.json");
-  const stackPath = path.join(devarchitectDir, "stack.json");
   const roadmapPath = path.join(devarchitectDir, "roadmap.json");
 
   checkPrereq("vision.json", "init");
@@ -27,8 +24,7 @@ async function roadmap() {
   const totalPhases = askTotalPhases.phasesno;
   const phaseArray = [];
 
-  for (var i = 0; i < totalPhases; i++) {
-    console.log(i + 1);
+  for (let i = 0; i < totalPhases; i++) {
     const response = await inquirer.prompt([
       {
         type: "input",
@@ -48,18 +44,17 @@ async function roadmap() {
     };
     phaseArray.push(phaseObj);
   }
-  const objOfPhaseArray = { phaseArray };
-  const objWithCreatedAt = {
-    ...objOfPhaseArray,
+  const roadmapData = {
+    phaseArray,
     createdAt: new Date().toISOString(),
   };
 
-  const roadmapString = JSON.stringify(objWithCreatedAt, null, 2);
-  backupIfExist(roadmapPath, "roadmap");
+  const roadmapString = JSON.stringify(roadmapData, null, 2);
+  backupIfExists(roadmapPath, "roadmap");
   fs.writeFileSync(roadmapPath, roadmapString, "utf-8");
 
   console.log(
-    chalk.yellow(`Roadmap created\nSaved to .devarchitect/roadmap.json`),
+    chalk.green(`Roadmap created\nSaved to .devarchitect/roadmap.json`),
   );
 }
 

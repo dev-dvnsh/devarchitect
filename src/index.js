@@ -12,11 +12,6 @@ import { progress } from "./commands/progress.js";
 import { status } from "./commands/status.js";
 import { dashboard } from "./commands/dashboard.js";
 
-// const args = process.argv.slice(2);
-
-// const options = args.filter((a) => a.startsWith("-"));
-// const values = args.filter((a) => !a.startsWith("-"));
-// console.log(args);
 program
   .name("devarchitect")
   .description("AI-assisted project architecture and planning tool")
@@ -24,53 +19,43 @@ program
 
 program
   .command("init")
-  .description("Initialized devarchitect in the current project")
+  .description("Initialize devarchitect in the current project")
   .action(init);
 
 program
   .command("export")
-  .description("Exports the vision.json file as devarchitect-report.md")
+  .description("Export project data as a markdown report")
   .action(exportVision);
 
 program
   .command("analyse")
-  .description("Analyze the vision.json file")
+  .description("Analyse project feasibility")
   .action(analyse);
 
 program
   .command("stack")
-  .description(
-    "Asks questions and creates .devarchitect/techstack.json with your answers and a createdAt timestamp inside.",
-  )
+  .description("Define your technology stack")
   .action(stack);
 
 program
   .command("roadmap")
-  .description(
-    "Asks how many phases, then asks name and milestones for each phase, then creates .devarchitect/roadmap.json with a phases array inside.",
-  )
+  .description("Create a project roadmap")
   .action(roadmap);
 
 program
   .command("decision")
-  .description(
-    "Asks about the decision, its need and other alternatives that were considered",
-  )
+  .description("Record an architectural decision")
   .action(decision);
 program
   .command("progress")
-  .description(
-    "Asks the programmer questions related to the roadmap to record progress and blockers to progress",
-  )
+  .description("Update project progress")
   .action(progress);
 program
   .command("status")
-  .description("Gives a quick health check for devarchitect setup")
+  .description("Show project health status")
   .action(status);
 program
   .command("dashboard")
-  .description(
-    "serve all the devarchitect json files from current project to the default browser",
-  )
+  .description("Open the devarchitect dashboard")
   .action(dashboard);
 program.parse();

@@ -3,13 +3,11 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 
-import { checkPrereq, backupIfExist } from "../utils.js";
+import { checkPrereq, backupIfExists } from "../utils.js";
 
 async function stack() {
   const rootDir = process.cwd();
   const devarchitectDir = path.join(rootDir, ".devarchitect");
-  const visionPath = path.join(devarchitectDir, "vision.json");
-  const analysePath = path.join(devarchitectDir, "analyse.json");
   const stackPath = path.join(devarchitectDir, "stack.json");
   checkPrereq("vision.json", "init");
   checkPrereq("analyse.json", "analyse");
@@ -48,11 +46,11 @@ async function stack() {
   };
 
   const stackString = JSON.stringify(stackWithDate, null, 2);
-  backupIfExist(stackPath, "stack");
+  backupIfExists(stackPath, "stack");
 
   fs.writeFileSync(stackPath, stackString, "utf-8");
 
-  console.log(chalk.yellow("Saved to .devarchitect/stack.json"));
+  console.log(chalk.green("Saved to .devarchitect/stack.json"));
 }
 
 export { stack };

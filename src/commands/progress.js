@@ -22,7 +22,7 @@ async function progress() {
     );
     countForProgressElem = progressFileArray.length + 1;
   } else {
-    countForProgressElem = 0;
+    countForProgressElem = 1;
   }
 
   const { currentPhase } = await inquirer.prompt([
@@ -37,8 +37,6 @@ async function progress() {
   const selectedPhase = roadmapData.phaseArray.find(
     (p) => p.name === currentPhase,
   );
-
-  // console.log(selectedPhase?.milestones ?? []);
 
   const rest = await inquirer.prompt([
     {

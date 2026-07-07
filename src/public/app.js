@@ -133,14 +133,14 @@ function renderAIPanel() {
 }
 
 async function loadSection(section) {
-  showLoading();
-  const result = await fetchData(section);
   if (section === "export") {
     window.location.href = BASE_URL + "/api/export";
     showExport();
     return;
   }
-  console.log(section);
+  showLoading();
+  const result = await fetchData(section);
+
   const commandObj = {
     vision: renderVision,
     analyse: renderAnalyse,
@@ -208,9 +208,6 @@ async function updateStatusDots() {
       } else {
         // If file doesn't exist, strip the success class
         dotSpan.classList.remove("success");
-      }
-      if ("vision.json" in result) {
-        exportBtn.classList.add("success");
       }
     }
   });

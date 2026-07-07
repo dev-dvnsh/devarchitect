@@ -12,7 +12,7 @@ function checkPrereq(filename, commandName) {
   }
 }
 
-function backupIfExist(filePath, command) {
+function backupIfExists(filePath, command) {
   const projectroot = process.cwd();
   const devarchitectdir = path.join(projectroot, ".devarchitect");
   const dirPath = path.join(devarchitectdir, "backup", command);
@@ -32,4 +32,4 @@ function backupIfExist(filePath, command) {
   }
 }
 
-export { checkPrereq, backupIfExist };
+export { checkPrereq, backupIfExists };

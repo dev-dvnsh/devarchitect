@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
-import { backupIfExist } from "../utils.js";
+import { backupIfExists } from "../utils.js";
 
 async function init() {
   const projectroot = process.cwd();
@@ -20,7 +20,7 @@ async function init() {
         "Do you want to overwrite vision.json (press n to exit and ENTER to continue)",
       default: true,
     });
-    if (overwriteVision.overwrite !== true) {
+    if (overwriteVision.overwrite == "n") {
       process.exit(1);
     }
   }
@@ -71,19 +71,13 @@ async function init() {
     createdat: new Date().toISOString(),
   };
 
-  // 5. write to vision.json
-  // use json.stringify(vision, null, 2) to make it readable
-  // use path.join(devarchitectdir, 'vision.json') for the file path
-  // use fs.writefilesync — simpler than writefile for now
-
   const visionstring = JSON.stringify(vision, null, 2);
 
-  backupIfExist(visionpath, "vision");
+  backupIfExists(visionpath, "vision");
 
   fs.writeFileSync(visionpath, visionstring, "utf-8");
 
-  console.log(chalk.yellow("Saved to .devarchitect/vision.json"));
-  // 6. print success message
+  console.log(chalk.green("Saved to .devarchitect/vision.json"));
 }
 
 export { init };

@@ -67,8 +67,6 @@ function exportVision() {
 
   let decisionCount = 0;
 
-  // ${!==null?``:`Not yet defined`}
-
   const mdString = `# Project Report - ${dataVision.projectname}
 
 Generated on ${new Date().toLocaleDateString()}
