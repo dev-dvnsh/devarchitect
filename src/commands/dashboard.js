@@ -1,14 +1,18 @@
 import path from "path";
 import open from "open";
 import chalk from "chalk";
+import { fileURLToPath } from "node:url";
 import { checkPrereq } from "../utils.js";
 import { spawn } from "node:child_process";
+import { dirname } from "node:path";
 
 async function dashboard() {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
   checkPrereq("vision.json", "init");
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  spawn("node", [path.join(process.cwd(), "src", "server", "index.js")], {
+  spawn("node", [path.join(__dirname, "..", "server", "index.js")], {
     stdio: "inherit", // server logs show in your terminal
   });
 

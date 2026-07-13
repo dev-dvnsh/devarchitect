@@ -1,7 +1,10 @@
 import path from "path";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 import fs from "fs";
 import http from "http";
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 function readJson(filename) {
   const projectRoot = process.cwd();
   const devarchitectDir = path.join(projectRoot, ".devarchitect");
@@ -30,7 +33,7 @@ const server = http.createServer((req, res) => {
         "Content-Type": "text/html",
         "Access-Control-Allow-Origin": "*",
       });
-      const htmlPath = path.join(process.cwd(), "src", "public", "index.html");
+      const htmlPath = path.join(__dirname, "..", "public", "index.html");
       if (fs.existsSync(htmlPath)) {
         const htmlFileData = fs.readFileSync(htmlPath);
         res.end(htmlFileData);
@@ -41,7 +44,7 @@ const server = http.createServer((req, res) => {
       console.log(err);
     }
   } else if (req.url.endsWith(".css") || req.url.endsWith(".js")) {
-    const filePath = path.join(process.cwd(), "src", "public", req.url);
+    const filePath = path.join(__dirname, "..", "public", req.url);
     if (fs.existsSync(filePath)) {
       const ext = req.url.endsWith(".css")
         ? "text/css"

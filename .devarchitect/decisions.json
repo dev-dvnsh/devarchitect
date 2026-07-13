@@ -10,5 +10,11 @@
     "why": "familarity and easy syntax",
     "alternatives": "go, c",
     "decidedAt": "2026-07-06T13:37:24.922Z"
+  },
+  {
+    "what": "to publish package to npm registery",
+    "why": "to make it easy to download and use devarchitect",
+    "alternatives": "none",
+    "decidedAt": "2026-07-07T08:05:15.237Z"
   }
 ]
