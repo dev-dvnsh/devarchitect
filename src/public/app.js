@@ -41,7 +41,7 @@ function renderVision(data) {
   <div class="field"><span class="label">Target</span><span>${data.target}</span></div>
   <div class="field"><span class="label">Platform</span><span>${data.platform}</span></div>
   <div class="field"><span class="label">Team Size</span><span>${data.teamsize}</span></div>
-  <div class="field"><span class="label">Created At</span><span>${new Date(data.createdat).toLocaleString()}</span></div>
+  <div class="field"><span class="label">Created At</span><span>${new Date(data.createdAt).toLocaleString()}</span></div>
 `;
   renderAIPanel();
 }
@@ -53,7 +53,7 @@ function renderAnalyse(data) {
   <div class="field"><span class="label">Timeline</span><span>${data.timeline}</span></div>
   <div class="field"><span class="label">Scale</span><span>${data.scale}</span></div>
   <div class="field"><span class="label">Budget</span><span>${data.budget}</span></div>
-  <div class="field"><span class="label">Created At</span><span>${new Date(data.createdat).toLocaleString()}</span></div>
+  <div class="field"><span class="label">Created At</span><span>${new Date(data.createdAt).toLocaleString()}</span></div>
 `;
   renderAIPanel();
 }
@@ -131,6 +131,10 @@ function renderAIPanel() {
     <button disabled title="Coming in devarchitect v2.0">Ask AI</button>
   `;
 }
+function showConnectionError() {
+  const elem = document.getElementById("data-panel");
+  elem.innerHTML = `<p>Could not connect to the devarchitect server</p><br/><code>make sure the dashboard server is running</code>`;
+}
 
 async function loadSection(section) {
   if (section === "export") {
@@ -140,6 +144,10 @@ async function loadSection(section) {
   }
   showLoading();
   const result = await fetchData(section);
+  if (!result) {
+    showConnectionError();
+    return;
+  }
 
   const commandObj = {
     vision: renderVision,
@@ -194,7 +202,7 @@ async function updateStatusDots() {
 
     // Safety check: ensure the button actually has a dot span and a section value
     if (dotSpan && sectionName) {
-      fileExists = false;
+      let fileExists = false;
       if (sectionName == "export") {
         fileExists = "vision.json" in result.data;
       } else {

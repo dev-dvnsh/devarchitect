@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
-import { checkPrereq } from "../utils.js";
+import { checkPrereq, backupIfExists } from "../utils.js";
 async function decision() {
   const rootDir = process.cwd();
   const devarchitectDir = path.join(rootDir, ".devarchitect");
@@ -37,6 +37,8 @@ async function decision() {
     ...promptAns,
     decidedAt: new Date().toISOString(),
   });
+
+  backupIfExists(progressPath, "progress");
 
   fs.writeFileSync(
     decisionsPath,

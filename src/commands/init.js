@@ -14,13 +14,12 @@ async function init() {
   if (fs.existsSync(visionpath)) {
     console.log(chalk.green("vision.json already exist"));
     const overwriteVision = await inquirer.prompt({
-      type: "input",
+      type: "confirm",
       name: "overwrite",
-      message:
-        "Do you want to overwrite vision.json (press n to exit and ENTER to continue)",
-      default: true,
+      message: "vision.json already exists. Do you want to overwrite it?",
+      default: false,
     });
-    if (overwriteVision.overwrite == "n") {
+    if (!overwriteVision.overwrite) {
       process.exit(1);
     }
   }
@@ -68,7 +67,7 @@ async function init() {
   // 4. build the data object with timestamp
   const vision = {
     ...answers,
-    createdat: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   };
 
   const visionstring = JSON.stringify(vision, null, 2);

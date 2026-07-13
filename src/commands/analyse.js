@@ -35,7 +35,7 @@ async function analyse() {
   ]);
   const analyseData = {
     ...answers,
-    createdat: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   };
 
   const analyseString = JSON.stringify(analyseData, null, 2);

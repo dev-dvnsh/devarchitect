@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 
-import { checkPrereq } from "../utils.js";
+import { checkPrereq, backupIfExists } from "../utils.js";
 async function progress() {
   const rootDir = process.cwd();
   const devarchitectDir = path.join(rootDir, ".devarchitect");
@@ -69,7 +69,7 @@ async function progress() {
     ...rest,
     recordedAt: new Date().toISOString(),
   });
-
+  backupIfExists(decisionsPath, "decision");
   fs.writeFileSync(
     progressPath,
     JSON.stringify(progressArray, null, 2),

@@ -150,16 +150,22 @@ const server = http.createServer((req, res) => {
     }
 
     const dataVision = visionResult.parsedFileData;
+    const analysisResult = readJson("analyse.json");
+    const dataAnalysis = analysisResult ? analysisResult.parsedFileData : null;
 
-    const dataAnalysis = readJson("analyse.json").parsedFileData;
+    const stackResult = readJson("stack.json");
+    const dataStack = stackResult ? stackResult.parsedFileData : null;
 
-    const dataStack = readJson("stack.json").parsedFileData;
+    const roadmapResult = readJson("roadmap.json");
+    const dataRoadmap = roadmapResult ? roadmapResult.parsedFileData : null;
 
-    const dataRoadmap = readJson("roadmap.json").parsedFileData;
-    const dataDecisions = readJson("decisions.json").parsedFileData;
+    const decisionsResult = readJson("decisions.json");
+    const dataDecisions = decisionsResult
+      ? decisionsResult.parsedFileData
+      : null;
 
-    const dataProgress = readJson("progress.json").parsedFileData;
-
+    const progressResult = readJson("progress.json");
+    const dataProgress = progressResult ? progressResult.parsedFileData : null;
     let decisionCount = 0;
 
     const mdString = `# Project Report - ${dataVision.projectname}
@@ -244,7 +250,6 @@ ${
 ${
   dataProgress !== null
     ? `- Current Phase: ${dataProgress[dataProgress.length - 1].currentPhase}
-- All Phases: ${dataProgress[dataProgress.length - 1].allPhases}
 - Completed Milestones: ${dataProgress[dataProgress.length - 1].completedMilestones}
 - Blockers: ${dataProgress[dataProgress.length - 1].blockers}
 - Completion: ${dataProgress[dataProgress.length - 1].completion} 

@@ -149,7 +149,6 @@ ${
 ${
   dataProgress !== null
     ? `- Current Phase: ${dataProgress[dataProgress.length - 1].currentPhase}
-- All Phases: ${dataProgress[dataProgress.length - 1].allPhases}
 - Completed Milestones: ${dataProgress[dataProgress.length - 1].completedMilestones}
 - Blockers: ${dataProgress[dataProgress.length - 1].blockers}
 - Completion: ${dataProgress[dataProgress.length - 1].completion} 
