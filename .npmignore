@@ -1,2 +1,6 @@
 node_modules/
 .env
+.devarchitect/
+TASKS.md
+devarchitect-bugs.md
+devarchitect-report.md
