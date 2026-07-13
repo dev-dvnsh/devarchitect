@@ -1,6 +1,6 @@
 {
   "name": "devarchitect",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AI-assisted project architecture and planning tool",
   "main": "index.js",
   "bin": {
