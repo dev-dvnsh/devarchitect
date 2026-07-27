@@ -1,0 +1,43 @@
+{
+  "node": [
+    "package.json",
+    "package-lock.json",
+    "npm-shrinkwrap.json",
+    "yarn.lock",
+    "pnpm-lock.yaml"
+  ],
+  "python": [
+    "requirements.txt",
+    "pyproject.toml",
+    "Pipfile",
+    "Pipfile.lock",
+    "poetry.lock",
+    "setup.py",
+    "setup.cfg",
+    "environment.yml",
+    "conda.yml"
+  ],
+  "java": [
+    "pom.xml",
+    "build.gradle",
+    "build.gradle.kts",
+    "settings.gradle",
+    "settings.gradle.kts",
+    "gradlew",
+    "gradlew.bat"
+  ],
+  "go": ["go.mod", "go.sum"],
+  "rust": ["Cargo.toml", "Cargo.lock"],
+  "php": ["composer.json", "composer.lock"],
+  "ruby": ["Gemfile", "Gemfile.lock", ".ruby-version"],
+  "dotnet": [
+    "*.csproj",
+    "*.fsproj",
+    "*.vbproj",
+    "*.sln",
+    "Directory.Build.props",
+    "Directory.Build.targets",
+    "global.json",
+    "packages.config"
+  ]
+}
