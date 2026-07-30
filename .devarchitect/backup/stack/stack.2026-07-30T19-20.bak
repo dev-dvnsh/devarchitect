@@ -1,0 +1,12 @@
+{
+  "frontend": [
+    "angular"
+  ],
+  "backend": [
+    "django"
+  ],
+  "database": "ds",
+  "deployment": "AWS",
+  "tools": "",
+  "createdAt": "2026-07-30T19:05:29.591Z"
+}

@@ -1,5 +1,3 @@
-import fs from "fs";
-import { detectStack } from "./detectStack.js";
 export function compareStacks(declaredStack, detectedStack) {
   const result = {
     matched: {},

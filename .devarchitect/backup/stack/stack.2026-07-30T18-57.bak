@@ -1,0 +1,10 @@
+{
+  "frontend": [
+    "Enter manually"
+  ],
+  "backend": "ds",
+  "database": "ds",
+  "deployment": "AWS",
+  "tools": "ds",
+  "createdAt": "2026-07-30T18:56:15.620Z"
+}
