@@ -103,6 +103,7 @@ function renderDecisions(data) {
   <div class="field"><span class="label">What</span><span>${decision.what}</span></div>
   <div class="field"><span class="label">Why</span><span>${decision.why}</span></div>
   <div class="field"><span class="label">Alternatives</span><span>${decision.alternatives}</span></div>
+<div class="field"><span class="label">Category</span><span>${decision.category ?? "Not inferred"}</span></div>
   <div class="field"><span class="label">Decided At</span><span>${new Date(decision.decidedAt).toLocaleString()}</span></div>
 `,
     )

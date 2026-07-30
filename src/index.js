@@ -11,6 +11,7 @@ import { decision } from "./commands/decision.js";
 import { progress } from "./commands/progress.js";
 import { status } from "./commands/status.js";
 import { dashboard } from "./commands/dashboard.js";
+import { why } from "./commands/why.js";
 
 program
   .name("devarchitect")
@@ -58,4 +59,9 @@ program
   .command("dashboard")
   .description("Open the devarchitect dashboard")
   .action(dashboard);
+program
+  .command("why <keyword>")
+  .description("Search project decisions")
+  .action(why);
+
 program.parse();

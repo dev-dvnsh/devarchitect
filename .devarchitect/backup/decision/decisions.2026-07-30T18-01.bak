@@ -22,13 +22,5 @@
     "why": "easy to use",
     "alternatives": "python",
     "decidedAt": "2026-07-30T18:01:32.196Z"
-  },
-  {
-    "what": "use json for storage ",
-    "why": "faster and decentralized",
-    "alternatives": "mongodb",
-    "decidedAt": "2026-07-30T18:01:54.014Z",
-    "category": "database"
   }
 ]
-

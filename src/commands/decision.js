@@ -10,8 +10,6 @@ const __dirname = path.dirname(__filename);
 const srcDir = path.join(__dirname, "..");
 const libDir = path.join(srcDir, "lib");
 
-console.log(libDir);
-
 const packageCategoryMap = JSON.parse(
   fs.readFileSync(path.join(libDir, "packageCategoryMap.json"), "utf-8"),
 );
