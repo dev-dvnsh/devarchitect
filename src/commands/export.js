@@ -132,10 +132,11 @@ ${
    dataDecisions !== null
      ? `${dataDecisions
          .map(
-           ({ what, why, decidedAt }) => `
+           ({ what, why, decidedAt, category }) => `
 ### Decision ${++decisionCount}
 - Decision: ${what}
 - Reason: ${why}
+- Category: ${category ?? "Not inferred"}
 - Decided on: ${decidedAt}
 `,
          )

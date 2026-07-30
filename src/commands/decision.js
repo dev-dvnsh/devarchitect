@@ -3,6 +3,21 @@ import fs from "fs";
 import path from "path";
 import chalk from "chalk";
 import { checkPrereq, backupIfExists } from "../utils.js";
+
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const srcDir = path.join(__dirname, "..");
+const libDir = path.join(srcDir, "lib");
+
+console.log(libDir);
+
+const packageCategoryMap = JSON.parse(
+  fs.readFileSync(path.join(libDir, "packageCategoryMap.json"), "utf-8"),
+);
+
+import { inferCategory } from "../lib/inferCategory.js";
+
 async function decision() {
   const rootDir = process.cwd();
   const devarchitectDir = path.join(rootDir, ".devarchitect");
@@ -32,11 +47,18 @@ async function decision() {
     : [];
 
   const decisionsArray = Array.isArray(existing) ? existing : [];
+  const decisionText = `${promptAns.what} ${promptAns.alternatives} ${promptAns.why}`;
+  const category = inferCategory(decisionText, packageCategoryMap);
 
-  decisionsArray.push({
+  const decisionEntry = {
     ...promptAns,
     decidedAt: new Date().toISOString(),
-  });
+  };
+
+  if (category) {
+    decisionEntry.category = category;
+  }
+  decisionsArray.push(decisionEntry);
 
   backupIfExists(decisionsPath, "decision");
 
