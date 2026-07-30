@@ -38,7 +38,7 @@ async function decision() {
     decidedAt: new Date().toISOString(),
   });
 
-  backupIfExists(progressPath, "progress");
+  backupIfExists(decisionsPath, "decision");
 
   fs.writeFileSync(
     decisionsPath,

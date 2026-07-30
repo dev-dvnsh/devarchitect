@@ -69,7 +69,7 @@ async function progress() {
     ...rest,
     recordedAt: new Date().toISOString(),
   });
-  backupIfExists(decisionsPath, "decision");
+  backupIfExists(progressPath, "progress");
   fs.writeFileSync(
     progressPath,
     JSON.stringify(progressArray, null, 2),
