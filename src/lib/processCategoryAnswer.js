@@ -16,7 +16,7 @@ export async function processCategoryAnswer(answer, categoryName) {
 
     return [
       ...answer.filter((value) => value !== "__MANUAL__"),
-      manualAnswer.technology,
+      manualAnswer.technology.trim(),
     ];
   }
 

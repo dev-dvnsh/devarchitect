@@ -1,17 +1,34 @@
-export function compareStacks(declaredStack, detectedStack) {
+import { normalizeStackValue } from "./normalizeStackValue.js";
+import { resolvePackageName } from "./resolvePackageName.js";
+export function compareStacks(declaredStack, detectedStack, categoryMap) {
   const result = {
     matched: {},
     missing: {},
     undeclared: {},
     misc: [],
   };
+
   // Compare declared against detected
   for (const category in declaredStack) {
-    const declaredPackages = declaredStack[category];
+    if (category === "createdAt") {
+      continue;
+    }
+
+    const declaredPackages = declaredStack[category] || [];
     const detectedPackages = detectedStack[category] || [];
 
+    const normalizedDetected = detectedPackages.map((packageName) =>
+      normalizeStackValue(packageName),
+    );
+
     for (const packageName of declaredPackages) {
-      if (detectedPackages.includes(packageName)) {
+      const resolvedDeclared = resolvePackageName(
+        packageName,
+        category,
+        categoryMap,
+      );
+
+      if (normalizedDetected.includes(resolvedDeclared)) {
         if (!result.matched[category]) {
           result.matched[category] = [];
         }
@@ -29,11 +46,17 @@ export function compareStacks(declaredStack, detectedStack) {
 
   // Find undeclared packages
   for (const category in detectedStack) {
-    const detectedPackages = detectedStack[category];
+    const detectedPackages = detectedStack[category] || [];
     const declaredPackages = declaredStack[category] || [];
 
+    const resolvedDeclared = declaredPackages.map((packageName) =>
+      resolvePackageName(packageName, category, categoryMap),
+    );
+
     for (const packageName of detectedPackages) {
-      if (!declaredPackages.includes(packageName)) {
+      const normalizedDetected = normalizeStackValue(packageName);
+
+      if (!resolvedDeclared.includes(normalizedDetected)) {
         if (!result.undeclared[category]) {
           result.undeclared[category] = [];
         }

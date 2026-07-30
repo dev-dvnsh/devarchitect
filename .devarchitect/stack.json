@@ -1,4 +1,8 @@
 {
-  "database": [],
-  "createdAt": "2026-07-30T19:36:44.897Z"
+  "authentication": ["auth0"],
+  "database": ["mongodb"],
+  "orm": ["mongoose"],
+  "monitoring": ["promethius"],
+  "createdAt": "2026-07-30T19:41:41.562Z"
 }
+

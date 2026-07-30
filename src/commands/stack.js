@@ -108,26 +108,33 @@ async function stack() {
     const knownCategory = hasCategory(packageCategoryMap, category);
 
     if (!knownCategory) {
-      const manualAnswer = await inquirer.prompt([
+      const answer = await inquirer.prompt([
         {
-          type: "input",
-          name: "technology",
-          message: `Enter your ${category} technology:`,
-          validate: (value) => {
-            if (!value.trim()) {
-              return "Technology cannot be empty";
-            }
-
-            return true;
-          },
+          type: "checkbox",
+          name: "technologies",
+          message:
+            `What ${category} technologies are you using? ` +
+            "(Space to select, Enter to confirm)",
+          choices: [
+            {
+              name: "Not decided yet",
+              value: "__NOT_DECIDED__",
+            },
+            {
+              name: "Enter manually",
+              value: "__MANUAL__",
+            },
+          ],
         },
       ]);
 
-      stackAnswers[category] = [manualAnswer.technology.trim()];
+      stackAnswers[category] = await processCategoryAnswer(
+        answer.technologies,
+        category,
+      );
 
       continue;
     }
-
     const choices = getCategoryChoices(packageCategoryMap, category);
 
     const answer = await inquirer.prompt([
