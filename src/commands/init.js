@@ -9,9 +9,20 @@ async function init() {
   const devarchitectdir = path.join(projectroot, ".devarchitect");
 
   const visionpath = path.join(devarchitectdir, "vision.json");
+  const packageJsonPath = path.join(projectroot, "package.json");
 
-  // 1. check if already initialized
+  let packageJsonData = "";
+  let nameFromPackageJson = "";
+  let descriptionFromPackageJson = "";
+
+  if (fs.existsSync(packageJsonPath)) {
+    packageJsonData = JSON.parse(fs.readFileSync(packageJsonPath));
+    nameFromPackageJson = packageJsonData.name;
+    descriptionFromPackageJson = packageJsonData.description;
+  }
+
   if (fs.existsSync(visionpath)) {
+    // 1. check if already initialized
     console.log(chalk.green("vision.json already exist"));
     const overwriteVision = await inquirer.prompt({
       type: "confirm",
@@ -30,6 +41,7 @@ async function init() {
       type: "input",
       name: "projectname",
       message: "enter name of your project!",
+      default: nameFromPackageJson,
 
       validate: (input) => {
         if (!input.match(/^[a-z0-9-]+$/)) {
@@ -42,6 +54,7 @@ async function init() {
       type: "input",
       name: "problem",
       message: "what problem does it solves?",
+      default: descriptionFromPackageJson,
     },
     {
       type: "input",

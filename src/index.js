@@ -12,6 +12,7 @@ import { progress } from "./commands/progress.js";
 import { status } from "./commands/status.js";
 import { dashboard } from "./commands/dashboard.js";
 import { why } from "./commands/why.js";
+import { drift } from "./commands/drift.js";
 
 program
   .name("devarchitect")
@@ -63,5 +64,9 @@ program
   .command("why <keyword>")
   .description("Search project decisions")
   .action(why);
+program
+  .command("drift")
+  .description("Compare declared stack with detected stack")
+  .action(drift);
 
 program.parse();
