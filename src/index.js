@@ -22,6 +22,7 @@ program
 program
   .command("init")
   .description("Initialize devarchitect in the current project")
+  .option("--from-git", "pre-fill from git history")
   .action(init);
 
 program

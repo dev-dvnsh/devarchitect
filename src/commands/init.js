@@ -2,9 +2,10 @@ import inquirer from "inquirer";
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
+import { execSync } from "child_process";
 import { backupIfExists } from "../utils.js";
 
-async function init() {
+async function init(options) {
   const projectroot = process.cwd();
   const devarchitectdir = path.join(projectroot, ".devarchitect");
 
@@ -19,6 +20,19 @@ async function init() {
     packageJsonData = JSON.parse(fs.readFileSync(packageJsonPath));
     nameFromPackageJson = packageJsonData.name;
     descriptionFromPackageJson = packageJsonData.description;
+    // console.log("packageJsonData", packageJsonData);
+  }
+  let projectStartedAt = null;
+  if (options.fromGit) {
+    try {
+      const gitRestult = execSync("git log --reverse --format=%ai")
+        .toString()
+        .split("\n");
+      // projectStartedAt = gitRestult[0];
+      projectStartedAt = new Date(gitRestult[0]).toISOString();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   if (fs.existsSync(visionpath)) {
@@ -81,6 +95,7 @@ async function init() {
   const vision = {
     ...answers,
     createdAt: new Date().toISOString(),
+    ...(projectStartedAt ? { projectStartedAt } : {}),
   };
 
   const visionstring = JSON.stringify(vision, null, 2);
