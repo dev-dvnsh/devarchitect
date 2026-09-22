@@ -11,6 +11,7 @@ async function status() {
   const roadmapPath = path.join(devarchitectdir, "roadmap.json");
   const decisionsPath = path.join(devarchitectdir, "decisions.json");
   const progressPath = path.join(devarchitectdir, "progress.json");
+  const driftPath = path.join(devarchitectdir, "drift.json");
 
   let projectName;
   let visionStat;
@@ -19,6 +20,7 @@ async function status() {
   let roadmapStat;
   let decisionsStat;
   let progressStat;
+  let driftStat;
 
   if (fs.existsSync(visionPath)) {
     const visionFileData = fs.readFileSync(visionPath, "utf-8");
@@ -52,6 +54,11 @@ async function status() {
   } else {
     decisionsStat = chalk.red("✗ decisions.json - run devarchitect decision");
   }
+  if (fs.existsSync(driftPath)) {
+    driftStat = chalk.green("✓ drift.json - drift checked");
+  } else {
+    driftStat = chalk.red("✗ drift.json - run devarchitect drift");
+  }
   if (fs.existsSync(progressPath)) {
     progressStat = chalk.green("✓ progress.json - progress recorded");
   } else {
@@ -65,6 +72,8 @@ async function status() {
   console.log(roadmapStat);
   console.log(decisionsStat);
   console.log(progressStat);
+
+  console.log(driftStat);
 }
 
 export { status };

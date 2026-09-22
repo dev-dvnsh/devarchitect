@@ -13,7 +13,7 @@ import { status } from "./commands/status.js";
 import { dashboard } from "./commands/dashboard.js";
 import { why } from "./commands/why.js";
 import { drift } from "./commands/drift.js";
-
+import { similarDecisions } from "./commands/similar-decisions.js";
 program
   .name("devarchitect")
   .description("AI-assisted project architecture and planning tool")
@@ -65,6 +65,12 @@ program
   .command("why <keyword>")
   .description("Search project decisions")
   .action(why);
+
+program
+  .command("similar-decisions")
+  .description("Find similar architectural decisions")
+  .action(similarDecisions);
+
 program
   .command("drift")
   .description("Compare declared stack with detected stack")

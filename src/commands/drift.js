@@ -61,7 +61,17 @@ async function drift() {
       ),
     );
   }
+  const driftData = {
+    matched: comparison.matched,
+    missing: comparison.missing,
+    undeclared: comparison.undeclared,
+    issues,
+    checkedAt: new Date().toISOString(),
+  };
 
+  const driftPath = path.join(devarchitectDir, "drift.json");
+
+  fs.writeFileSync(driftPath, JSON.stringify(driftData, null, 2), "utf-8");
   console.log();
 
   if (issues === 0) {

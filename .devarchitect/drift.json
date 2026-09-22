@@ -1,0 +1,15 @@
+{
+  "matched": {},
+  "missing": {
+    "authentication": ["auth0"],
+    "database": ["mongodb"],
+    "orm": ["mongoose"],
+    "monitoring": ["promethius"]
+  },
+  "undeclared": {
+    "misc": ["chalk", "commander", "inquirer", "open"]
+  },
+  "issues": 5,
+  "checkedAt": "2026-09-22T08:39:27.038Z"
+}
+

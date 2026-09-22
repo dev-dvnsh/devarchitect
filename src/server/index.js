@@ -73,6 +73,7 @@ const server = http.createServer((req, res) => {
         "progress.json": fs.existsSync(
           path.join(devarchitectDir, "progress.json"),
         ),
+        "drift.json": fs.existsSync(path.join(devarchitectDir, "drift.json")),
       };
 
       sendJson(res, 200, { success: true, data: status });
@@ -132,6 +133,16 @@ const server = http.createServer((req, res) => {
   } else if (req.url == "/api/progress" || req.url == "/api/progress/") {
     try {
       const result = readJson("progress.json");
+      sendJson(res, 200, {
+        success: result != null,
+        data: result ? result.parsedFileData : null,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  } else if (req.url == "/api/drift" || req.url == "/api/drift/") {
+    try {
+      const result = readJson("drift.json");
       sendJson(res, 200, {
         success: result != null,
         data: result ? result.parsedFileData : null,
