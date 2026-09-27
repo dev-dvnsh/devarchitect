@@ -1,16 +1,27 @@
 {
   "name": "devarchitect",
   "version": "0.2.0",
-  "description": "AI-assisted project architecture and planning tool",
-  "main": "index.js",
+  "description": "A CLI tool for project architecture planning, decision logging, and drift detection",
+  "main": "./src/index.js",
   "bin": {
     "devarchitect": "./src/index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dev-dvnsh/devarchitect.git"
+  },
+  "keywords": [
+    "cli",
+    "architecture",
+    "adr",
+    "drift-detection",
+    "project-planning",
+    "developer-tools"
+  ],
+  "author": "Devansh Bhardwaj",
   "license": "ISC",
   "type": "module",
   "dependencies": {

@@ -6,17 +6,23 @@ The commands are designed to be run in a specific order. Each one builds on the 
 
 ## Order
 
-```
+```text
 init → analyse → stack → roadmap → decision → progress
 ```
 
-`decision`, `progress`, and `status` can be run at any point after init.
+`decision`, `progress`, `drift`, `why`, `similar-decisions`, `install-hooks`, and `status` can be run at any point as the project grows.
 
 ---
 
 ## `devarchitect init`
 
 The starting point. Run this at the beginning of any project.
+
+If you run it inside an existing project, it automatically checks `package.json` to pre-fill the project name and description as defaults. You can also pass the `--from-git` flag to pull the first commit date from your Git history:
+
+```bash
+devarchitect init --from-git
+```
 
 Asks:
 
@@ -81,6 +87,8 @@ Saves to: `.devarchitect/roadmap.json`
 
 This one is different from the others — it does not overwrite anything. Every time you run it, it appends a new entry to `decisions.json`. The idea is to run this whenever you make an important call — switching a library, changing the architecture, dropping a feature — and record what you decided and why.
 
+Before saving, devarchitect silently scans your answers against its built-in package map and automatically tags the decision with a `category` (like `database`, `testing`, or `authentication`) if it recognizes a technology or category keyword.
+
 Needs: `vision.json`
 
 Asks:
@@ -90,6 +98,53 @@ Asks:
 - What alternatives were considered
 
 Appends to: `.devarchitect/decisions.json`
+
+---
+
+## `devarchitect why <keyword>`
+
+Searches through all your recorded decisions in `decisions.json` and prints matching entries sorted from newest to oldest. It checks both the text fields (`what`, `why`, `alternatives`) and the auto-inferred `category` field.
+
+Needs: `decisions.json`
+
+Example usage:
+
+```bash
+devarchitect why database
+devarchitect why express
+```
+
+---
+
+## `devarchitect similar-decisions`
+
+Finds pairs of recorded decisions that are conceptually related even if they don't share the exact same keywords. It tokenizes your decision logs, builds a vocabulary, calculates TF-IDF vectors for each entry, and computes pairwise cosine similarity to surface related architectural choices.
+
+Needs: `decisions.json` (works best once you have at least 5–6 decisions logged)
+
+---
+
+## `devarchitect drift`
+
+Checks whether your actual codebase still matches what you planned in `stack.json`. It reads your project's manifest files (such as `package.json` or `requirements.txt`), maps installed packages to their categories, and compares them against your declared stack.
+
+It prints a color-coded terminal report showing:
+
+- **Matched:** Declared technologies that are present in the project
+- **Missing:** Technologies declared in `stack.json` that were not detected
+- **Undeclared:** Packages detected in your manifest files that were never declared in `stack.json`
+
+Needs: `stack.json`
+
+Saves to: `.devarchitect/drift.json`
+
+---
+
+## `devarchitect install-hooks`
+
+Installs a Git `pre-commit` hook inside `.git/hooks/pre-commit` that automatically runs `devarchitect drift` before every commit. It prints drift warnings right in your terminal when you commit changes, but always exits with `0` so it never blocks your commits. If a `pre-commit` hook already exists, it asks before overwriting.
+
+Needs: A Git repository (`.git` folder)
 
 ---
 
@@ -118,15 +173,16 @@ Needs: nothing
 
 Example output:
 
-```
+```text
 Project: devarchitect
 -----------------------------
-✓ vision.json      — initialized
-✓ analyse.json     — analyzed
-✓ stack.json       — stack defined
-✗ roadmap.json     — run devarchitect roadmap
-✗ decisions.json   — run devarchitect decision
-✗ progress.json    — run devarchitect progress
+✓ vision.json     - initialized
+✓ analyse.json    - analyzed
+✓ stack.json      - stack defined
+✓ roadmap.json    - roadmap defined
+✓ decisions.json  - decisions recorded
+✓ progress.json   - progress recorded
+✗ drift.json      - run devarchitect drift
 ```
 
 ---
@@ -139,17 +195,17 @@ Needs: `vision.json`
 
 Output: `devarchitect-report.md` in the project root
 
-The report includes: Vision, Feasibility Analysis, Tech Stack, Roadmap, Decisions Log, Current Progress.
+The report includes: Vision, Feasibility Analysis, Tech Stack, Roadmap, Decisions Log, Current Progress, and Drift Report.
 
 ---
 
 ## `devarchitect dashboard`
 
-Starts a local server on port 3001 and opens the browser. The dashboard shows everything in one place with a sidebar for navigating between sections. The Export button in the dashboard downloads the same markdown report as the CLI export command.
+Starts a local server on port 3001 and opens the browser. The dashboard shows everything in one place with a sidebar for navigating between sections, including green status dots for completed steps and your latest Drift Report. The Export button in the dashboard downloads the same markdown report as the CLI export command.
 
 Needs: `vision.json`
 
-```
+```text
 http://localhost:3001
 Ctrl+C to stop
 ```
