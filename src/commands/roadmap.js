@@ -12,8 +12,6 @@ async function roadmap() {
 
   checkPrereq("vision.json", "init");
 
-  checkPrereq("analyse.json", "analyse");
-
   checkPrereq("stack.json", "stack");
 
   const askTotalPhases = await inquirer.prompt({

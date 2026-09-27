@@ -1,146 +1,123 @@
 # Architecture
 
-Notes on how devarchitect is built internally. Mostly written so I remember why I made certain decisions, and so anyone reading the code has some context before diving in.
+This document explains how `devarchitect` is structured internally, how data flows between commands, and how the core analysis modules work under the hood.
 
 ---
 
-## The basic idea
+## Design Philosophy
 
-There are three separate pieces:
-
-```
-CLI → writes JSON files → Server reads them → Dashboard displays them
-```
-
-They are independent. The CLI works without the server. The server works without the dashboard being open. The dashboard is just a visual layer on top of what the CLI already does.
+1. **Local-first, human-readable storage:** Everything lives inside `.devarchitect/` in the project root as plain JSON files. There is no external database or cloud account required. Because the data is just JSON, it can be committed to Git alongside the code so the project's architectural context travels with the repository.
+2. **Minimal dependencies:** The CLI uses `commander`, `inquirer`, and `chalk` for terminal interaction, while the dashboard server, frontend UI, stack detector, and similarity algorithms are written from scratch using Node.js built-ins (`fs`, `path`, `http`, `child_process`) and vanilla JavaScript.
+3. **Non-destructive updates:** Whenever a command overwrites an existing state file (like `stack.json` or `decisions.json`), the tool creates a timestamped `.bak` copy inside `.devarchitect/backup/` first so previous work is never lost.
 
 ---
 
-## CLI
+## High-Level Structure
 
-**Entry point: `src/index.js`**
+The codebase is split into four layers inside `src/`:
 
-Uses Commander.js to register commands and map them to handler functions in `src/commands/`. The shebang line at the top (`#!/usr/bin/env node`) is what makes it run as a terminal command. The `bin` field in `package.json` tells npm what name to use when linking it globally.
-
-**Commands: `src/commands/`**
-
-One file per command. They all follow the same pattern:
-
-1. Check prerequisites — exit if required files are missing
-2. Ask questions — Inquirer.js prompts
-3. Build the data object — spread the answers and add a timestamp
-4. Write to JSON — fs.writeFileSync
-5. Print confirmation — chalk colored output
-
-**Shared utilities: `src/utils.js`**
-
-Two functions used by multiple commands:
-
-`checkPrereq(filename, commandName)` — checks if a file exists before the command runs. If not, prints an error and exits. Avoids repeating this logic in every command file.
-
-`backupIfExists(filePath, command)` — before any file gets overwritten, this copies it to `.devarchitect/backup/[command]/` with a timestamp in the filename. Simple versioning — nothing fancy but it means you can never accidentally destroy data.
-
-**Why JSON files and not a database**
-
-I considered SQLite but it felt like overkill for what this tool needs to do. JSON files are human-readable, require no setup, work everywhere, and can be opened in any text editor. The tradeoff is that they are not great for concurrent writes — but devarchitect is a single-user CLI tool so that is not a real concern here.
-
-`decisions.json` and `progress.json` are arrays that grow over time. Every other file is an object that gets replaced on each run (with a backup made first).
-
----
-
-## Server
-
-**File: `src/server/index.js`**
-
-I used Node's built-in `http` module instead of Express. For eight endpoints that just read JSON files and send them back, Express felt unnecessary. It also means zero extra dependencies for the server.
-
-Two helper functions do most of the work:
-
-`readJson(filename)` — builds the path to `.devarchitect/filename`, checks if it exists, reads it, parses it, and returns the parsed data. Returns null if the file does not exist. Every data endpoint calls this.
-
-`sendJson(res, statusCode, data)` — sets the Content-Type and CORS headers and sends the response. All endpoints use this instead of writing headers manually each time.
-
-Every response follows the same shape:
-
-```json
-{ "success": true, "data": { ... } }
-{ "success": false, "data": null }
+```text
+src/
+├── index.js          — CLI entry point & Commander registration
+├── utils.js          — Prerequisite checks (checkPrereq) & backup helpers
+├── commands/         — User-facing CLI commands (1 file per command)
+├── lib/              — Pure logic modules & static knowledge maps
+├── server/           — Local Node.js HTTP server (port 3001)
+└── public/           — Vanilla HTML, CSS, and JS dashboard frontend
 ```
 
-This makes the dashboard JS simple — it always checks `result.success` before trying to use `result.data`.
+- **`src/commands/`** handles user interaction: reading terminal arguments, running `inquirer` prompts, reading/writing JSON files, and printing formatted `chalk` output.
+- **`src/lib/`** contains the core logic and data dictionaries separated from terminal I/O so each piece stays modular and testable.
+- **`src/server/` & `src/public/`** power the browser dashboard without requiring a frontend build step or Express.
 
-The server also serves static files (HTML, CSS, JS) from `src/public/` so the dashboard does not need a separate dev server.
+---
 
-**Routes:**
+## Data Storage Layer (`.devarchitect/`)
 
+Running `devarchitect` commands generates and reads seven JSON files inside the target project's `.devarchitect/` folder:
+
+| File             | Created By | Structure             | Purpose                                                                                                                |
+| :--------------- | :--------- | :-------------------- | :--------------------------------------------------------------------------------------------------------------------- |
+| `vision.json`    | `init`     | Single Object         | Stores project name, problem, target audience, platform, team size, and creation timestamp.                            |
+| `analyse.json`   | `analyse`  | Single Object         | Stores technical risks, timeline, expected scale, and budget.                                                          |
+| `stack.json`     | `stack`    | Single Object         | Stores declared technology choices across categories (`frontend`, `backend`, `database`, `deployment`, `tools`).       |
+| `roadmap.json`   | `roadmap`  | Object (`phaseArray`) | Stores ordered project phases and their milestone arrays.                                                              |
+| `decisions.json` | `decision` | Array of Objects      | Append-only log of architectural decisions (`what`, `why`, `alternatives`, `category`, `decidedAt`).                   |
+| `progress.json`  | `progress` | Array of Objects      | Append-only log of progress snapshots (`currentPhase`, `completedMilestones`, `blockers`, `completion`, `recordedAt`). |
+| `drift.json`     | `drift`    | Single Object         | Stores the latest drift comparison (`matched`, `missing`, `undeclared`, `issues`, `checkedAt`).                        |
+
+### Prerequisite Enforcement
+
+Commands that depend on earlier planning steps call `checkPrereq(filename, commandName)` from `src/utils.js`. For example, `analyse` checks for `vision.json`, and `roadmap` checks for `vision.json`, `analyse.json`, and `stack.json`. If a required file is missing, the CLI stops early and tells the developer which command to run first.
+
+---
+
+## Core Engine (`src/lib/`)
+
+### 1. Knowledge Maps (`packageCategoryMap.json` & `ecosystemManifestMap.json`)
+
+To compare what a developer planned against what is actually in their codebase, `devarchitect` uses two static JSON dictionaries:
+
+- **`ecosystemManifestMap.json`** maps project manifest files (such as `package.json`, `requirements.txt`, `go.mod`, `Cargo.toml`) to their respective language ecosystems.
+- **`packageCategoryMap.json`** maps real-world package names across ecosystems (Node, Python, Go, Rust) to normalized architectural categories (`backend-framework`, `frontend-framework`, `database`, `orm`, `testing`, `authentication`, `deployment`, etc.).
+
+### 2. Stack Detection & Drift Analysis (`detectStack.js` & `compareStack.js`)
+
+When `devarchitect drift` runs, it executes a three-step pipeline:
+
+1. **Extract & Detect (`extractPackages.js`, `detectStack.js`):** Scans `process.cwd()` for recognized manifest files, extracts declared dependencies (e.g., `dependencies` and `devDependencies` from `package.json` or lines from `requirements.txt`), and maps each package to its category using `packageCategoryMap.json`.
+2. **Compare (`compareStack.js`, `normalizeStackValue.js`, `resolvePackageName.js`):** Compares the developer's declared stack in `stack.json` against the detected packages in the codebase and groups findings into three buckets:
+   - **`matched`**: Declared technologies that are present in the project's dependencies.
+   - **`missing`**: Technologies declared in `stack.json` that were not found in the manifest files.
+   - **`undeclared`**: Packages installed in the project that were not declared in `stack.json`.
+3. **Persist & Report (`drift.js`):** Prints a color-coded terminal breakdown and saves the structured output to `.devarchitect/drift.json` so `status`, `export`, and `dashboard` can read it.
+
+### 3. Silent Category Inference (`inferCategory.js`)
+
+When a developer records a new decision using `devarchitect decision`, the tool does not ask them to manually pick a category. Instead, `inferCategory.js` scans the combined text of their answers (`what`, `why`, `alternatives`) against known package names and category keywords in `packageCategoryMap.json`.
+
+- If a match is found (e.g., mentioning `mongodb` or `postgres`), `"category": "database"` is automatically attached to the decision object.
+- If no match is found, the `category` key is omitted cleanly.
+- `devarchitect why <keyword>` then searches across both the raw text fields and this inferred `category` field to filter decisions.
+
+### 4. Conceptual Similarity via TF-IDF (`similarity.js`)
+
+`devarchitect similar-decisions` finds decisions that are conceptually related even when they do not share exact keywords, using an information retrieval pipeline built from scratch:
+
+1. **Tokenization (`tokenize`):** Converts each decision's combined text (`what` + `why` + `alternatives`) to lowercase, strips punctuation, removes single-character tokens, and filters out common English stopwords.
+2. **Vocabulary Construction (`buildVocabulary`):** Collects all unique tokens across every recorded decision into a sorted master vocabulary array.
+3. **TF-IDF Vectorization (`computeTFIDF`):** Converts each decision into a numerical vector matching the vocabulary length:
+   - **Term Frequency (TF):** How frequently a word appears in a single decision divided by the total words in that decision.
+   - **Inverse Document Frequency (IDF):** $\log(\text{Total Decisions} / \text{Decisions Containing the Word})$, which penalizes generic words that appear in almost every decision and boosts distinctive words.
+4. **Cosine Similarity (`cosineSimilarity`):** Computes the dot product of every pair of decision vectors divided by the product of their magnitudes. Pairs scoring above the `0.15` similarity threshold are printed as a percentage match.
+
+---
+
+## Git Pre-Commit Hook (`install-hooks.js`)
+
+Running `devarchitect install-hooks` checks for a `.git/` directory in the current project and writes a shell script to `.git/hooks/pre-commit` with executable permissions (`0o755`).
+
+```sh
+#!/bin/sh
+# Automatically generated by devarchitect
+echo "Running devarchitect drift check..."
+devarchitect drift
+exit 0
 ```
-GET /              — serves index.html
-GET *.css / *.js   — serves static files from src/public/
-GET /api/status    — returns which JSON files exist
-GET /api/vision    — vision.json
-GET /api/analyse   — analyse.json
-GET /api/stack     — stack.json
-GET /api/roadmap   — roadmap.json
-GET /api/decisions — decisions.json
-GET /api/progress  — progress.json
-GET /api/export    — builds and downloads the markdown report
-```
+
+The script intentionally ends with `exit 0` so that architectural drift is surfaced right before a commit happens without blocking the developer from committing their work.
 
 ---
 
-## Dashboard
+## Local Server & Dashboard (`src/server/` & `src/public/`)
 
-**Files: `src/public/`**
+Running `devarchitect dashboard` launches a lightweight HTTP server (`src/server/index.js`) on `http://localhost:3001` and opens the browser using the `open` package.
 
-Vanilla HTML, CSS, and JavaScript. No React, no build step, no Vite, no npm install. The whole dashboard is three files that load directly in the browser.
+### API Endpoints
 
-I chose vanilla JS because the dashboard is simple enough that a framework would add more complexity than it removes. There are six sections, each with a fetch call and a render function. That does not need React.
+The server reads directly from `process.cwd() + '/.devarchitect/'` on each request so the UI always reflects the latest files:
 
-**Layout**
-
-CSS Grid with a fixed 240px sidebar on the left and a content area on the right. The content area has two panels stacked vertically — one for project data, one reserved for AI suggestions in the next version.
-
-**How the JS works**
-
-On page load:
-
-- Fetches `/api/status` and updates the colored dots next to each sidebar button
-- Loads the Vision section automatically so the dashboard is never empty
-
-When a button is clicked:
-
-- Event delegation on the aside element handles all button clicks with one listener
-- `loadSection(section)` fetches the data and calls the right render function
-- Each render function builds an HTML string and sets it as innerHTML of `#data-panel`
-
-The AI panel is currently a placeholder with a disabled Ask AI button. The space is reserved for v0.2.0.
-
----
-
-## Decisions I made and why
-
-**No Express** — the http module is enough for this use case and keeps the dependency list short.
-
-**No React** — the dashboard is simple enough for vanilla JS. Adding React would mean adding a build step, which means more complexity for something that does not need it.
-
-**JSON files instead of a database** — simpler, portable, human-readable. Works on any machine with no setup.
-
-**Append instead of overwrite for decisions and progress** — these are logs, not settings. Overwriting them would destroy history which defeats the purpose of tracking them.
-
-**Backup before overwrite for everything else** — data loss is annoying. A simple timestamped backup costs almost nothing and prevents a lot of frustration.
-
----
-
-## Planned for v0.2.0
-
-**AI integration**
-
-After saving data, each command will optionally call an AI API to generate suggestions. The Ask AI button in the dashboard will send the current section data to the API and display the response. Users will provide their own API key via `devarchitect config --apikey` so there is no central server or cost involved.
-
-**devarchitect check**
-
-The most interesting planned feature. It will read `.devarchitect/decisions.json` and compare it against the actual codebase — package.json dependencies, import statements, folder structure, git history — and flag contradictions. For example if you logged a decision saying "no database, JSON files only" but your package.json has a postgres dependency, it will catch that. Nothing like this exists for local codebases right now.
-
-**arc**
-
-After the college submission the CLI core will be rewritten in Go and distributed as a single binary called `arc`. No Node.js required, faster startup, easier to install. Same concept, different runtime.
+- `GET /` and static assets (`.css`, `.js`) — Serves `index.html`, `style.css`, and `app.js` from `src/public/`.
+- `GET /api/status` — Returns a boolean map of which `.json` files currently exist in `.devarchitect/`, used by `app.js` to light up the green status dots in the sidebar.
+- `GET /api/vision`, `/api/analyse`, `/api/stack`, `/api/roadmap`, `/api/decisions`, `/api/progress`, `/api/drift` — Reads and returns the corresponding JSON file (or `success: false` if the command hasn't been run yet).
+- `GET /api/export` — Compiles all existing JSON files into `devarchitect-report.md` on the fly and triggers a browser file download using the `Content-Disposition: attachment` header.

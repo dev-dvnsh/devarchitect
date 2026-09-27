@@ -55,6 +55,7 @@ Once your project is underway, you can use the analysis and search commands:
 
 ```bash
 devarchitect drift               # compare your actual codebase against stack.json
+devarchitect view <section>      # view saved data (vision, stack, drift, decisions, etc.)
 devarchitect why <keyword>       # search past decisions by keyword or auto-inferred category
 devarchitect similar-decisions   # find conceptually related decisions using TF-IDF
 devarchitect install-hooks       # add a git pre-commit hook to check for drift automatically
@@ -133,6 +134,7 @@ devarchitect/
 │   │   ├── progress.js
 │   │   ├── export.js
 │   │   ├── status.js
+│   │   ├── view.js
 │   │   └── dashboard.js
 │   ├── lib/                          — core logic for detection, comparison, and math
 │   │   ├── detectStack.js

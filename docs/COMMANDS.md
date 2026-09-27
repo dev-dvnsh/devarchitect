@@ -140,6 +140,24 @@ Saves to: `.devarchitect/drift.json`
 
 ---
 
+## `devarchitect view <section>`
+
+Prints the formatted contents of any saved `.devarchitect/` file directly in the terminal so you can inspect your project data or full drift report without opening the browser dashboard or triggering interactive prompts.
+
+Available sections: `vision`, `analyse`, `stack`, `roadmap`, `decisions`, `progress`, `drift`
+
+Needs: The corresponding `.json` file for that section
+
+Example usage:
+
+```bash
+devarchitect view drift
+devarchitect view stack
+devarchitect view decisions
+```
+
+---
+
 ## `devarchitect install-hooks`
 
 Installs a Git `pre-commit` hook inside `.git/hooks/pre-commit` that automatically runs `devarchitect drift` before every commit. It prints drift warnings right in your terminal when you commit changes, but always exits with `0` so it never blocks your commits. If a `pre-commit` hook already exists, it asks before overwriting.

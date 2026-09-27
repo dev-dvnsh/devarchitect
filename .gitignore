@@ -1,4 +1,6 @@
 # Logs
+.devarchitect/backup/
+.DS_Store
 logs
 devarchitect-report.md
 TASKS.md

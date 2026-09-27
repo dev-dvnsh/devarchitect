@@ -15,6 +15,7 @@ import { why } from "./commands/why.js";
 import { drift } from "./commands/drift.js";
 import { similarDecisions } from "./commands/similar-decisions.js";
 import installHooks from "./commands/install-hooks.js";
+import { view } from "./commands/view.js";
 program
   .name("devarchitect")
   .description("AI-assisted project architecture and planning tool")
@@ -81,4 +82,11 @@ program
   .command("install-hooks")
   .description("Install a git pre-commit hook to check for architectural drift")
   .action(installHooks);
+
+program
+  .command("view <section>")
+  .description(
+    "View saved project data (vision, analyse, stack, roadmap, decisions, progress, drift)",
+  )
+  .action(view);
 program.parse();

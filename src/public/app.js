@@ -59,12 +59,16 @@ function renderAnalyse(data) {
 }
 function renderStack(data) {
   const elem = document.getElementById("data-panel");
+  const fieldsHtml = Object.entries(data)
+    .filter(([key]) => key !== "createdAt")
+    .map(([category, items]) => {
+      const value = Array.isArray(items) ? items.join(", ") : items;
+      return `<div class="field"><span class="label">${category}</span><span>${value || "None"}</span></div>`;
+    })
+    .join("");
+
   elem.innerHTML = `
-  <div class="field"><span class="label">Frontend</span><span>${data.frontend}</span></div>
-  <div class="field"><span class="label">Backend</span><span>${data.backend}</span></div>
-  <div class="field"><span class="label">Database</span><span>${data.database}</span></div>
-  <div class="field"><span class="label">Deployment</span><span>${data.deployment}</span></div>
-  <div class="field"><span class="label">Tools</span><span>${data.tools}</span></div>
+  ${fieldsHtml}
   <div class="field"><span class="label">Created At</span><span>${new Date(data.createdAt).toLocaleString()}</span></div>
 `;
   renderAIPanel();
@@ -228,10 +232,10 @@ async function updateStatusDots() {
     // Safety check: ensure the button actually has a dot span and a section value
     if (dotSpan && sectionName) {
       let fileExists = false;
-      if (sectionName == "export") {
-        fileExists = "vision.json" in result.data;
+      if (sectionName === "export") {
+        fileExists = result.data["vision.json"] === true;
       } else {
-        fileExists = `${sectionName}.json` in result.data;
+        fileExists = result.data[`${sectionName}.json`] === true;
       }
       // Check if the section key exists in the result.data object
 

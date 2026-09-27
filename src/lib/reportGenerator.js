@@ -1,128 +1,171 @@
-function hasItems(section) {
-  return Object.keys(section).length > 0;
+import fs from "fs";
+import path from "path";
+
+function readJsonSafe(dir, filename) {
+  const filePath = path.join(dir, filename);
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+  } catch {
+    return null;
+  }
 }
-function hasMiscItems(misc) {
-  return misc && misc.length > 0;
+
+export function generateReport(projectRoot = process.cwd()) {
+  const devarchitectDir = path.join(projectRoot, ".devarchitect");
+  const dataVision = readJsonSafe(devarchitectDir, "vision.json");
+
+  if (!dataVision) {
+    return null;
+  }
+
+  const dataAnalysis = readJsonSafe(devarchitectDir, "analyse.json");
+  const dataStack = readJsonSafe(devarchitectDir, "stack.json");
+  const dataRoadmap = readJsonSafe(devarchitectDir, "roadmap.json");
+  const dataDecisions = readJsonSafe(devarchitectDir, "decisions.json");
+  const dataProgress = readJsonSafe(devarchitectDir, "progress.json");
+  const dataDrift = readJsonSafe(devarchitectDir, "drift.json");
+
+  let decisionCount = 0;
+
+  return `# Project Report - ${dataVision.projectname}
+
+Generated on ${new Date().toLocaleDateString()}
+
+---
+
+## Vision
+
+- Problem: ${dataVision.problem}
+- Target: ${dataVision.target}
+- Platform: ${dataVision.platform}
+- Team Size: ${dataVision.teamsize}
+
+---
+
+## Feasibility Analysis
+
+${
+  dataAnalysis !== null
+    ? `- Technical Risks: ${dataAnalysis.techrisk}
+- Project Timeline: ${dataAnalysis.timeline}
+- Project Scale: ${dataAnalysis.scale}
+- Project Budget: ${dataAnalysis.budget}`
+    : `- Not yet defined`
 }
-export function reportGenerator(result) {
-  const matchedCategories = Object.keys(result.matched || {}).length;
 
-  const matchedPackages = Object.values(result.matched || {}).flat().length;
+---
 
-  const missingCategories = Object.keys(result.missing || {}).length;
+## Tech Stack
 
-  const missingPackages = Object.values(result.missing || {}).flat().length;
-
-  const undeclaredCategories = Object.keys(result.undeclared || {}).length;
-
-  const undeclaredPackages = Object.values(result.undeclared || {}).flat()
-    .length;
-
-  const miscPackages = (result.misc || []).length;
-  let report = "";
-  let status = "NO DRIFT";
-
-  if (missingPackages > 0 || undeclaredPackages > 0) {
-    status = "DRIFT DETECTED";
-  } else if (miscPackages > 0) {
-    status = "UNKNOWN PACKAGES FOUND";
-  }
-  report += "============================================================\n";
-  report += "                     DEVARCHITECT REPORT\n";
-  report += "============================================================\n\n";
-
-  if (hasItems(result.matched)) {
-    report += "MATCHED\n";
-    report +=
-      "------------------------------------------------------------\n\n";
-
-    for (const category in result.matched) {
-      report += `${category}\n`;
-
-      for (const packageName of result.matched[category]) {
-        report += `  - ${packageName}\n`;
-      }
-      function hasMiscItems(misc) {
-        function hasMiscItems(misc) {
-          return misc && misc.length > 0;
-        }
-        return misc && misc.length > 0;
-      }
-      let status = "NO DRIFT";
-
-      if (missingPackages > 0 || undeclaredPackages > 0) {
-        status = "DRIFT DETECTED";
-      } else if (miscPackages > 0) {
-        status = "UNKNOWN PACKAGES FOUND";
-      }
-      report += "\n";
-    }
-  }
-
-  report += "------------------------------------------------------------\n\n";
-
-  if (hasItems(result.missing)) {
-    report += "MISSING\n";
-    report +=
-      "------------------------------------------------------------\n\n";
-
-    for (const category in result.missing) {
-      report += `${category}\n`;
-
-      for (const packageName of result.missing[category]) {
-        report += `  - ${packageName}\n`;
-      }
-
-      report += "\n";
-    }
-  }
-  report += "------------------------------------------------------------\n\n";
-
-  if (hasItems(result.undeclared)) {
-    report += "UNDECLARED\n";
-    report +=
-      "------------------------------------------------------------\n\n";
-
-    for (const category in result.undeclared) {
-      report += `${category}\n`;
-
-      for (const packageName of result.undeclared[category]) {
-        report += `  - ${packageName}\n`;
-      }
-
-      report += "\n";
-    }
-  }
-  if (hasMiscItems(result.misc)) {
-    report += "MISC\n";
-    report +=
-      "------------------------------------------------------------\n\n";
-
-    for (const packageName of result.misc) {
-      report += `  - ${packageName}\n`;
-    }
-
-    report += "\n";
-  }
-  report += "------------------------------------------------------------\n\n";
-
-  report += "SUMMARY\n";
-  report += "------------------------------------------------------------\n\n";
-
-  report += `Matched Categories      : ${matchedCategories}\n`;
-  report += `Matched Packages        : ${matchedPackages}\n\n`;
-
-  report += `Missing Categories      : ${missingCategories}\n`;
-  report += `Missing Packages        : ${missingPackages}\n\n`;
-
-  report += `Undeclared Categories   : ${undeclaredCategories}\n`;
-  report += `Undeclared Packages     : ${undeclaredPackages}\n\n`;
-
-  report += `Misc Packages          : ${miscPackages}\n\n`;
-
-  report += `Overall Status          : ${status}\n\n`;
-
-  report += "============================================================\n";
-
-  return report;
+${
+  dataStack !== null
+    ? Object.entries(dataStack)
+        .filter(([key]) => key !== "createdAt")
+        .map(
+          ([category, items]) =>
+            `- ${category}: ${Array.isArray(items) ? items.join(", ") : items}`,
+        )
+        .join("\n")
+    : `- Not yet defined`
 }
+
+---
+
+## Roadmap
+
+${
+  dataRoadmap !== null
+    ? `${dataRoadmap.phaseArray
+        .map(
+          ({ phase, name, milestones }) => `
+### Phase: ${phase}
+- Name: ${name}
+- Milestones: [ ${Array.isArray(milestones) ? milestones.join(", ") : milestones} ]
+`,
+        )
+        .join("")}`
+    : `- Not yet defined\n`
+}
+---
+
+## Decisions Log
+
+${
+  dataDecisions !== null && dataDecisions.length > 0
+    ? `${dataDecisions
+        .map(
+          ({ what, why, decidedAt, category }) => `
+### Decision ${++decisionCount}
+- Decision: ${what}
+- Reason: ${why}
+- Category: ${category ?? "Not inferred"}
+- Decided on: ${new Date(decidedAt).toLocaleString()}
+`,
+        )
+        .join("")}`
+    : `- Not yet defined\n`
+}
+---
+
+## Current Progress
+
+${
+  dataProgress !== null && dataProgress.length > 0
+    ? `- Current Phase: ${dataProgress[dataProgress.length - 1].currentPhase}
+- Completed Milestones: ${
+        Array.isArray(dataProgress[dataProgress.length - 1].completedMilestones)
+          ? dataProgress[dataProgress.length - 1].completedMilestones.join(", ")
+          : dataProgress[dataProgress.length - 1].completedMilestones
+      }
+- Blockers: ${dataProgress[dataProgress.length - 1].blockers}
+- Completion: ${dataProgress[dataProgress.length - 1].completion}
+- Recorded At: ${new Date(dataProgress[dataProgress.length - 1].recordedAt).toLocaleString()}`
+    : `- Not yet defined`
+}
+
+---
+
+## Drift Report
+
+${
+  dataDrift !== null
+    ? `- Issues: ${dataDrift.issues}
+- Checked At: ${new Date(dataDrift.checkedAt).toLocaleString()}
+
+### Matched
+${
+  Object.keys(dataDrift.matched).length > 0
+    ? Object.entries(dataDrift.matched)
+        .map(([category, items]) => `- ${category}: ${items.join(", ")}`)
+        .join("\n")
+    : "- None"
+}
+
+### Missing
+${
+  Object.keys(dataDrift.missing).length > 0
+    ? Object.entries(dataDrift.missing)
+        .map(([category, items]) => `- ${category}: ${items.join(", ")}`)
+        .join("\n")
+    : "- None"
+}
+
+### Undeclared
+${
+  Object.keys(dataDrift.undeclared).length > 0
+    ? Object.entries(dataDrift.undeclared)
+        .map(([category, items]) => `- ${category}: ${items.join(", ")}`)
+        .join("\n")
+    : "- None"
+}`
+    : `- Not yet defined`
+}
+
+---
+
+Generated by devarchitect
+`;
+}
+
+export default generateReport;

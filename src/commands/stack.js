@@ -4,40 +4,48 @@ import path from "path";
 import chalk from "chalk";
 
 import { checkPrereq, backupIfExists } from "../utils.js";
+import { detectStack } from "../lib/detectStack.js";
+import { getCategoryChoices, hasCategory } from "../lib/getCategoryChoices.js";
+import { processCategoryAnswer } from "../lib/processCategoryAnswer.js";
+import { getCategories } from "../lib/getCategories.js";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const srcDir = path.join(__dirname, "..");
 const libDir = path.join(srcDir, "lib");
-import { getCategoryChoices, hasCategory } from "../lib/getCategoryChoices.js";
-import { processCategoryAnswer } from "../lib/processCategoryAnswer.js";
-import { getCategories } from "../lib/getCategories.js";
+
 const packageCategoryMap = JSON.parse(
   fs.readFileSync(path.join(libDir, "packageCategoryMap.json"), "utf-8"),
 );
 const categories = getCategories(packageCategoryMap);
-const categoryChoices = [
-  {
-    name: "Not decided yet",
-    value: "__NOT_DECIDED__",
-  },
-  {
-    name: "Enter category manually",
-    value: "__MANUAL_CATEGORY__",
-  },
-  ...categories.map((category) => ({
-    name: category,
-    value: category,
-  })),
-];
 
 async function stack() {
   const rootDir = process.cwd();
   const devarchitectDir = path.join(rootDir, ".devarchitect");
   const stackPath = path.join(devarchitectDir, "stack.json");
   checkPrereq("vision.json", "init");
-  checkPrereq("analyse.json", "analyse");
+
+  const detectedStack = detectStack(rootDir) || {};
+
+  const categoryChoices = [
+    {
+      name: "Not decided yet",
+      value: "__NOT_DECIDED__",
+    },
+    {
+      name: "Enter category manually",
+      value: "__MANUAL_CATEGORY__",
+    },
+    ...categories.map((category) => ({
+      name: category,
+      value: category,
+      checked:
+        Array.isArray(detectedStack[category]) &&
+        detectedStack[category].length > 0,
+    })),
+  ];
+
   const categoryAnswers = await inquirer.prompt([
     {
       type: "checkbox",
@@ -135,7 +143,19 @@ async function stack() {
 
       continue;
     }
-    const choices = getCategoryChoices(packageCategoryMap, category);
+
+    const detectedForCategory = Array.isArray(detectedStack[category])
+      ? detectedStack[category].map((pkg) => pkg.toLowerCase())
+      : [];
+
+    const choices = getCategoryChoices(packageCategoryMap, category).map(
+      (choice) => ({
+        ...choice,
+        checked:
+          detectedForCategory.includes(String(choice.value).toLowerCase()) ||
+          detectedForCategory.includes(String(choice.name).toLowerCase()),
+      }),
+    );
 
     const answer = await inquirer.prompt([
       {
@@ -153,6 +173,7 @@ async function stack() {
       category,
     );
   }
+
   const stackWithDate = {
     ...stackAnswers,
     createdAt: new Date().toISOString(),
