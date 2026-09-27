@@ -158,7 +158,7 @@ ${
 ## Current Progress
 
 ${
-  dataProgress !== null
+  dataProgress !== null && dataProgress.length > 0
     ? `- Current Phase: ${dataProgress[dataProgress.length - 1].currentPhase}
 - Completed Milestones: ${dataProgress[dataProgress.length - 1].completedMilestones}
 - Blockers: ${dataProgress[dataProgress.length - 1].blockers}

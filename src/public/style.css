@@ -109,6 +109,8 @@ aside button.active {
   padding: 24px;
   min-height: 300px;
   color: var(--text-secondary);
+  flex: 1;
+  overflow-y: auto;
 }
 
 #ai-panel {
@@ -118,6 +120,7 @@ aside button.active {
   padding: 24px;
   min-height: 200px;
   color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
 /* AI panel heading */

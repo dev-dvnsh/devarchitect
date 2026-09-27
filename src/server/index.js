@@ -177,6 +177,11 @@ const server = http.createServer((req, res) => {
 
     const progressResult = readJson("progress.json");
     const dataProgress = progressResult ? progressResult.parsedFileData : null;
+
+    // NEW: Read drift data
+    const driftResult = readJson("drift.json");
+    const dataDrift = driftResult ? driftResult.parsedFileData : null;
+
     let decisionCount = 0;
 
     const mdString = `# Project Report - ${dataVision.projectname}
@@ -244,10 +249,11 @@ ${
    dataDecisions !== null
      ? `${dataDecisions
          .map(
-           ({ what, why, decidedAt }) => `
+           ({ what, why, decidedAt, category }) => `
 ### Decision ${++decisionCount}
 - Decision: ${what}
 - Reason: ${why}
+- Category: ${category ?? "Not inferred"}
 - Decided on: ${new Date(decidedAt).toLocaleString()}
 `,
          )
@@ -259,12 +265,50 @@ ${
 ## Current Progress
 
 ${
-  dataProgress !== null
+  dataProgress !== null && dataProgress.length > 0
     ? `- Current Phase: ${dataProgress[dataProgress.length - 1].currentPhase}
 - Completed Milestones: ${dataProgress[dataProgress.length - 1].completedMilestones}
 - Blockers: ${dataProgress[dataProgress.length - 1].blockers}
 - Completion: ${dataProgress[dataProgress.length - 1].completion} 
 - Recorded At: ${new Date(dataProgress[dataProgress.length - 1].recordedAt).toLocaleString()}`
+    : `- Not yet defined`
+}
+
+---
+
+## Drift Report
+
+${
+  dataDrift !== null
+    ? `- Issues: ${dataDrift.issues}
+- Checked At: ${new Date(dataDrift.checkedAt).toLocaleString()}
+
+### Matched
+${
+  Object.keys(dataDrift.matched).length > 0
+    ? Object.entries(dataDrift.matched)
+        .map(([category, items]) => `- ${category}: ${items.join(", ")}`)
+        .join("\n")
+    : "- None"
+}
+
+### Missing
+${
+  Object.keys(dataDrift.missing).length > 0
+    ? Object.entries(dataDrift.missing)
+        .map(([category, items]) => `- ${category}: ${items.join(", ")}`)
+        .join("\n")
+    : "- None"
+}
+
+### Undeclared
+${
+  Object.keys(dataDrift.undeclared).length > 0
+    ? Object.entries(dataDrift.undeclared)
+        .map(([category, items]) => `- ${category}: ${items.join(", ")}`)
+        .join("\n")
+    : "- None"
+}`
     : `- Not yet defined`
 }
 

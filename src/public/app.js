@@ -27,7 +27,7 @@ function showEmpty(section) {
     roadmap: "roadmap",
     decisions: "decisions",
     progress: "progress",
-    // export: "export",
+    drift: "drift", // NEW
   };
   elem.innerHTML = `<p>No data found</p><br/><code>run devarchitect ${commandObj[section]}</code>`;
 }
@@ -96,21 +96,23 @@ function renderRoadmap(data) {
 function renderDecisions(data) {
   const elem = document.getElementById("data-panel");
   const revedData = data.slice().reverse();
+
   elem.innerHTML = revedData
     .map(
       (decision) => `
-
-  <div class="field"><span class="label">What</span><span>${decision.what}</span></div>
-  <div class="field"><span class="label">Why</span><span>${decision.why}</span></div>
-  <div class="field"><span class="label">Alternatives</span><span>${decision.alternatives}</span></div>
-<div class="field"><span class="label">Category</span><span>${decision.category ?? "Not inferred"}</span></div>
-  <div class="field"><span class="label">Decided At</span><span>${new Date(decision.decidedAt).toLocaleString()}</span></div>
+    <div style="margin-bottom: 24px; padding-bottom: 12px; border-bottom: 2px solid var(--bg-primary);">
+      <div class="field"><span class="label">What</span><span>${decision.what}</span></div>
+      <div class="field"><span class="label">Why</span><span>${decision.why}</span></div>
+      <div class="field"><span class="label">Alternatives</span><span>${decision.alternatives}</span></div>
+      <div class="field"><span class="label">Category</span><span>${decision.category ?? "Not inferred"}</span></div>
+      <div class="field"><span class="label">Decided At</span><span>${new Date(decision.decidedAt).toLocaleString()}</span></div>
+    </div>
 `,
     )
     .join("");
+
   renderAIPanel();
 }
-
 function renderProgress(data) {
   const elem = document.getElementById("data-panel");
   elem.innerHTML = `
@@ -121,6 +123,28 @@ function renderProgress(data) {
   <div class="field"><span class="label">Completion</span><span>${data[data.length - 1].completion}</span></div>
   <div class="field"><span class="label">Recorded At</span><span>${new Date(data[data.length - 1].recordedAt).toLocaleString()}</span></div>
 `;
+  renderAIPanel();
+}
+function renderDrift(data) {
+  const elem = document.getElementById("data-panel");
+
+  const renderList = (obj) => {
+    const keys = Object.keys(obj);
+    if (keys.length === 0) return "<span>None</span>";
+    return keys
+      .map(
+        (cat) => `<span><strong>${cat}:</strong> ${obj[cat].join(", ")}</span>`,
+      )
+      .join("<br/>");
+  };
+
+  elem.innerHTML = `
+  <div class="field"><span class="label">Total Issues</span><span>${data.issues}</span></div>
+  <div class="field"><span class="label">Matched</span><div>${renderList(data.matched)}</div></div>
+  <div class="field"><span class="label">Missing</span><div>${renderList(data.missing)}</div></div>
+  <div class="field"><span class="label">Undeclared</span><div>${renderList(data.undeclared)}</div></div>
+  <div class="field"><span class="label">Checked At</span><span>${new Date(data.checkedAt).toLocaleString()}</span></div>
+  `;
   renderAIPanel();
 }
 
@@ -157,7 +181,7 @@ async function loadSection(section) {
     roadmap: renderRoadmap,
     decisions: renderDecisions,
     progress: renderProgress,
-    // export: renderExport,
+    drift: renderDrift, // NEW
   };
   if (result.success) {
     return commandObj[section](result.data);

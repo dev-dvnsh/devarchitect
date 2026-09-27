@@ -72,7 +72,6 @@ async function status() {
   console.log(roadmapStat);
   console.log(decisionsStat);
   console.log(progressStat);
-
   console.log(driftStat);
 }
 

@@ -14,6 +14,7 @@ import { dashboard } from "./commands/dashboard.js";
 import { why } from "./commands/why.js";
 import { drift } from "./commands/drift.js";
 import { similarDecisions } from "./commands/similar-decisions.js";
+import installHooks from "./commands/install-hooks.js";
 program
   .name("devarchitect")
   .description("AI-assisted project architecture and planning tool")
@@ -76,4 +77,8 @@ program
   .description("Compare declared stack with detected stack")
   .action(drift);
 
+program
+  .command("install-hooks")
+  .description("Install a git pre-commit hook to check for architectural drift")
+  .action(installHooks);
 program.parse();
