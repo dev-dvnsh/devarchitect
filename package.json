@@ -1,6 +1,6 @@
 {
   "name": "devarchitect",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A CLI tool for project architecture planning, decision logging, and drift detection",
   "main": "./src/index.js",
   "bin": {
