@@ -25,7 +25,7 @@ npm install -g devarchitect
 Or if you want to run it from source, clone the repo and link it locally:
 
 ```bash
-git clone [https://github.com/dev-dvnsh/devarchitect](https://github.com/dev-dvnsh/devarchitect)
+git clone https://github.com/dev-dvnsh/devarchitect
 cd devarchitect
 npm install
 npm link

@@ -2,9 +2,9 @@
   "name": "devarchitect",
   "version": "1.0.0",
   "description": "A CLI tool for project architecture planning, decision logging, and drift detection",
-  "main": "./src/index.js",
+  "main": "src/index.js",
   "bin": {
-    "devarchitect": "./src/index.js"
+    "devarchitect": "src/index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
